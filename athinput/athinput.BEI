@@ -1,0 +1,80 @@
+<comment>
+
+problem = BE sphere with Thermal Instability
+author  = C. G. Kim
+journal = 
+config  = --with-problem=ti_collapse --enable-starparticle --with-gas=hydro --with-eos=isothermal --enable-fft --with-flux=hllc --with-integrator=vl --with-gravity=fft_obc --with-order=2p
+
+<job>
+
+problem_id      = BEI65         # problem ID: basename of output filenames
+maxout          = 5          # Output blocks number from 1 -> maxout
+num_domains     = 1          # number of Domains in Mesh
+
+<log>
+file_open       = 1
+
+<output1>
+out_fmt = hst                # History data dump
+dt      = 0.1                # time increment between outputs
+
+<output2>
+out_fmt = bin                # Binary data dump
+dt      = 0.1                 # time increment between outputs
+
+<output3>
+out_fmt = rst                # Restart data dump
+dt      = 10.0               # time increment between outputs
+
+<output4>
+out_fmt = sphst             # History data dump
+dt      = 0.0               # time increment between outputs
+
+<output5>
+out_fmt = starpar_vtk             # History data dump
+dt      = 0.1               # time increment between outputs
+
+
+
+<time>
+
+cour_no         = 0.3       # The Courant, Friedrichs, & Lewy (CFL) Number
+nlim            = -1        # cycle limit
+tlim            = 5.0       # time limit
+
+<domain1>
+
+level           = 0         # refinement level this Domain (root=0)
+Nx1             = 65        # Number of zones in X-direction
+x1min           = -3.000 # minimum value of X
+x1max           = 3.000  # maximum value of X
+bc_ix1          = 2          # inner-I (X) boundary flag
+bc_ox1          = 2          # outer-I (X) boundary flag
+NGrid_x1	= 2
+
+Nx2             = 65         # Number of zones in Y-direction
+x2min           = -3.000 # minimum value of Y
+x2max           = 3.000  # maximum value of Y
+bc_ix2          = 2          # inner-J (Y) boundary flag
+bc_ox2          = 2          # outer-J (Y) boundary flag
+NGrid_x2	= 2
+
+Nx3             = 65         # Number of zones in X3-direction
+x3min           = -3.000     # minimum value of X3
+x3max           = 3.000      # maximum value of X3
+bc_ix3          = 2          # inner-K (Z) boundary flag
+bc_ox3          = 2          # outer-K (Z) boundary flag
+NGrid_x3	= 2
+
+AutoWithNProc	= 8
+
+<problem>
+
+iso_csound	= 1.0
+gamma           = 1.6666666666666667    # gamma = C_p/C_v
+amp             = 2.0       # Pext/Pedge <= amp
+pok             = 3000.      # P/k
+Tcenter         = 20.      # T at center of core
+kappa           = 1.e5       # conductivity in unit of c.g.s.
+rin		= 2.000
+iprob		= 2

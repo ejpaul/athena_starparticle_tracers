@@ -1,0 +1,72 @@
+esystem_roe.o: esystem_roe.c ../copyright.h ../defs.h ../athena.h \
+  ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
+  ../prototypes.h ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h
+exact.o: exact.c ../copyright.h ../defs.h ../athena.h \
+  ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
+  ../prototypes.h ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h
+exact_sr.o: exact_sr.c ../copyright.h ../defs.h ../athena.h \
+  ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
+  ../prototypes.h ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h
+force.o: force.c ../copyright.h ../defs.h ../athena.h \
+  ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
+  ../prototypes.h ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h
+hllc.o: hllc.c ../copyright.h ../defs.h ../athena.h ../tracers/tracers.h \
+  ../tracers/../config.h ../globals.h prototypes.h ../prototypes.h \
+  ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h
+hlld.o: hlld.c ../copyright.h ../defs.h ../athena.h ../tracers/tracers.h \
+  ../tracers/../config.h ../globals.h prototypes.h ../prototypes.h \
+  ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h
+hllc_sr.o: hllc_sr.c ../copyright.h ../defs.h ../athena.h \
+  ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
+  ../prototypes.h ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h
+hlle_sr.o: hlle_sr.c ../copyright.h ../defs.h ../athena.h \
+  ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
+  ../prototypes.h ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h
+hlld_sr.o: hlld_sr.c ../copyright.h ../defs.h ../athena.h \
+  ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
+  ../prototypes.h ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h
+hlle.o: hlle.c ../copyright.h ../defs.h ../athena.h ../tracers/tracers.h \
+  ../tracers/../config.h ../globals.h prototypes.h ../prototypes.h \
+  ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h
+roe.o: roe.c ../copyright.h ../defs.h ../athena.h ../tracers/tracers.h \
+  ../tracers/../config.h ../globals.h prototypes.h ../prototypes.h \
+  ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h hlle.c
+two_shock.o: two_shock.c ../copyright.h ../defs.h ../athena.h \
+  ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
+  ../prototypes.h ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../microphysics/prototypes.h ../particles/prototypes.h \
+  ../reconstruction/prototypes.h ../star_particles/prototypes.h \
+  ../tracers/prototypes.h

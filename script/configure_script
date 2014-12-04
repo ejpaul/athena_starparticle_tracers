@@ -1,0 +1,12 @@
+./configure --with-problem=starpar_ti --with-gas=hydro --enable-cooling --with-integrator=vl --with-order=2p --enable-fft --enable-starparticle --enable-mpi --enable-shearing-box --enable-fofc --with-gravity=fft_disk --with-flux=roe --enable-starparstrict 
+
+./configure --with-problem=starpar_test --with-gas=hydro --enable-cooling --with-integrator=vl --with-order=2p --enable-fft --enable-starparticle --enable-mpi --enable-fofc --with-flux=roe --enable-starparstrict --with-gravity=fft
+
+./configure --with-problem=starpar_sntest --with-gas=hydro --enable-cooling --with-integrator=vl --with-order=2p --enable-fft --enable-mpi --enable-fofc --with-flux=roe --enable-h-correction
+
+./configure --with-problem=starpar_sntest --with-gas=hydro --enable-cooling --with-integrator=ctu --with-order=2 --enable-fft --enable-mpi --with-flux=roe  --enable-h-correction
+
+./configure --with-problem=starpar_sntest --with-gas=hydro --with-integrator=vl --with-order=2p --enable-fft --enable-starparticle --enable-mpi --enable-fofc --with-flux=roe
+
+./configure --with-problem=sntest --with-gas=hydro --enable-cooling --with-integrator=vl --with-order=2p --enable-fft --enable-mpi --enable-fofc --with-flux=roe --enable-h-correction
+

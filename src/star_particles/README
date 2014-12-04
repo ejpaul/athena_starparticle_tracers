@@ -1,0 +1,36 @@
+Code part:
+
+athena.h                 define star_particle and link list pointer
+init_grid.c              initialize link list pointer
+main.c                   add integrate_particles block
+new_dt.c                 add star particle velocity restriction to new_dt
+selfg_fft.c 
+selfg_fft_disk.c 
+selfg_fft_obc.c          call assign_parden() to assign star particle density to grids
+create_starparticles.c   create star particles if criteria are satisfied
+assign_starparticles.c   assign star particles density to grids
+synchro_starparticles.c  assemble star particle information from all processors,
+                         destroy old star particle lists (local, global, global_fda) 
+                         create all new star particle lists (local, global, global_fda)
+                         merge particles if their control volumes interfere 
+update_starparticle.c    update particles' mass & the gas parameters where particles reside, it is called in the integrate_3d_vl.c
+integrate_starparticles.c    interpolate force back to particle & update particle information
+dump_binary.c            add code to output particles information at the same time as binary is outputed
+
+
+CONFIGURE part:
+
+configure.ac             add options for STAR_PARTICLE
+src/def.h.in                 DEFINE STAR_PARTICLE
+src/Makefile.in          ADD STAR_PARTICLE_OBJ, ALL_OBJ
+src/star_particle        create Makefile.in
+src/show_config.c        show star particle on/off after set up
+
+
+Disable gravitational force to grid cells:
+1. comment the gravitational source terms in integrators under directory src/integrators/
+2. comment selfg_fc(&(Mesh.Domain[nl][nd])) in the main.c at 9f of the main loop.
+
+To update particle mass, need mass flux:
+  athena.h 
+   ***x1MassFlux, ***x2MassFlux, **x3MassFlux could be used without setting up new array

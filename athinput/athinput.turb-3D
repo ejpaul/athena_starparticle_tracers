@@ -1,0 +1,101 @@
+<comment>
+problem = Isothermal driven/decaying turbulence
+author  = A. Skinner
+journal = unpublished
+# WITHOUT GRAVITY:
+config  = --with-problem=turb2 --with-gas=hydro --with-integrator=vl --with-flux=hllc --with-eos=isothermal --enable-fft --enable-mpi
+# WITH GRAVITY:
+# config  = --with-problem=turb2 --with-gas=hydro --with-integrator=vl --with-flux=hllc --with-eos=isothermal --enable-fft --with-gravity=fft_obc --enable-mpi
+
+<log>
+file_open       = 0                 # write to .out file?  otherwise, writes to stdout
+out_level       = 1                 # sets output level (default=0)
+
+<job>
+problem_id      = Turb              # problem ID: basename of output filenames
+maxout          = 3                 # Output blocks number from 1 -> maxout
+num_domains     = 1                 # number of Domains in Mesh
+
+<output1>
+out_fmt         = vtk                 # VTK data dump
+dt              = 0.001               # time increment between outputs
+out             = MC_num
+id              = MC_num
+usr_expr_flag   = 1
+
+#<output2>
+#out_fmt         = vtk                 # VTK data dump
+#dt              = 0.001               # time increment between outputs
+#out             = dEk
+#id              = dEk
+#usr_expr_flag   = 1
+
+#<output3>
+#out_fmt         = vtk
+#dt              = 0.001               # time increment between outputs
+#out             = dEb
+#id              = dEb
+#usr_expr_flag   = 1
+
+<output2>
+out_fmt         = vtk               # VTK data output
+dt              = 0.001             # time increment between outputs
+out             = prim               # output variable
+
+<output3>
+out_fmt         = vtk                 # VTK data dump
+dt              = 0.001               # time increment between outputs
+out             = MC_tophat
+id              = MC_tophat
+usr_expr_flag   = 1
+
+<time>
+cour_no         = 0.4               # The Courant, Friedrichs, & Lewy (CFL) Number
+nlim            = 1000000           # cycle limit
+tlim            = 0.2               # time limit
+
+<domain1>
+level           = 0                 # refinement level this Domain (root=0)
+Nx1             = 128               # Number of zones in R-direction
+x1min           = -0.5              # minimum value of R
+x1max           = 0.5               # maximum value of R
+bc_ix1          = 4                 # inner (R) boundary flag
+bc_ox1          = 4                 # outer (R) boundary flag
+
+Nx2             = 128               # Number of zones in PHI-direction
+x2min           = -0.5              # minimum value of PHI
+x2max           = 0.5               # maximum value of PHI (=pi/4)
+bc_ix2          = 4                 # inner (PHI) boundary flag
+bc_ox2          = 4                 # outer (PHI) boundary flag
+
+Nx3             = 128               # Number of zones in Z-direction
+x3min           = -0.5              # minimum value of Z
+x3max           = 0.5               # maximum value of Z
+bc_ix3          = 4
+bc_ox3          = 4
+
+NGrid_x1        = 3
+NGrid_x2        = 1
+NGrid_x3        = 1
+
+<problem>
+N_proportional  = 100
+four_pi_G       = 12.56
+grav_mean_rho   = 1
+gamma           = 1.66666666666667  # gamma = C_p/C_v (NOT USED)
+iso_csound      = 1.0               # isothermal sound speed
+rseed           = -1                # seed for the random number generator (must be integer <= 0)
+dtdrive         = 0.001             # interval for generating new driving spectrum
+beta            = 0.02              # isothermal pressure/magnetic pressure (MHD only)
+dedt            = 1.0e3             # energy injection rate
+expo            = 3.0               # exponent of power-law spectrum (ispect=1)
+kpeak           = 8.0               # G&O spectral peak (ispect=2)
+klow            = 2.0               # multiple of 2*pi/L for cut-off at low  wavenumbers
+khigh           = 32.0 #64.0              # multiple of 2*pi/L for cut-off at high wavenumbers
+                                    # (NB: Must be no larger than 1/2 the minimum resolution)
+#ispect          = 2                 # spectrum type:  ispect=1, decreasing power-law (original form) #                       =2, form from Gammie & Ostrike
+ispect = 2
+#expo = (-5/3)
+idrive          = 0                 # driving type:   idrive=0, driven turbulence
+                                    #                       =1, decaying turbulence 
+

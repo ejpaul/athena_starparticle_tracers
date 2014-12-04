@@ -1,0 +1,75 @@
+<comment>
+
+problem = 3D Bonnor-Ebert sphere collapse
+author  = Hao Gong, Eve Ostriker
+journal =
+config  = --with-problem=starpar_besphere --enable-starparticle --with-gas=hydro --with-eos=isothermal --enable-fft --with-flux=hllc --with-integrator=vl --with-gravity=fft_obc --with-order=2p 
+
+<job>
+
+problem_id      = BE65       # problem ID: basename of output filenames
+maxout          = 5          # Output blocks number from 1 -> maxout
+num_domains     = 1          # number of Domains in Mesh
+
+<log>
+
+file_open	= 1
+<output1>
+out_fmt = vtk               # HDF-SDS data dump
+dt      = 0.01              # time increment between outputs
+
+<output2>
+out_fmt = rst                # Restart dump
+dt      = 0.1
+
+<output3>
+out_fmt = hst               # History data dump
+dt      = 2.5e-3            # time increment between outputs
+
+<output4>
+out_fmt = sphst             # History data dump
+dt      = 0.0               # time increment between outputs
+
+<output5>
+out_fmt = starpar_vtk       # History data dump
+dt      = 0.01              # time increment between outputs
+
+<time>
+cour_no         = 0.4       # The Courant, Friedrichs, & Lewy (CFL) Number
+nlim            = 1000000         # cycle limit
+#nlim            = 1         # cycle limit
+tlim            = 0.3       # time limit
+
+<domain1>
+level           = 0         # refinement level this Domain (root=0)
+Nx1             = 65        # Number of zones in X-direction
+x1min           = -0.301          # minimum value of X
+x1max           = 0.301          # maximum value of X
+bc_ix1          = 2         # inner-I (X) boundary flag
+bc_ox1          = 2         # outer-I (X) boundary flag
+NGrid_x1        = 2
+
+Nx2             = 65        # Number of zones in Y-direction
+x2min           = -0.301          # minimum value of Y
+x2max           = 0.301          # maximum value of Y
+bc_ix2          = 2         # inner-J (Y) boundary flag
+bc_ox2          = 2         # outer-J (Y) boundary flag
+NGrid_x2        = 2
+
+Nx3             = 65        # Number of zones in X3-direction
+x3min           = -0.301          # minimum value of X3
+x3max           = 0.301          # maximum value of X3
+bc_ix3          = 2         # inner-K (Z) boundary flag
+bc_ox3          = 2         # outer-K (Z) boundary flag
+NGrid_x3        = 2
+
+<problem>
+Gcons           = 3.1415926535987 #Gravitational constant
+iso_csound      = 1.0       # isothermal sound speed
+gamma           = 1.0       # gamma = C_p/C_v
+rho_crt         = 2.0       # factor for density enhancement
+xc              = 0.0
+yc              = 0.0
+zc              = 0.0
+r_out           = 0.274	    # r_crit = 0.274 in unit of Gong & Ostriker (2013)
+dratio          = 14.04     # rho_c/rho_e = 14.04, 17.75 for r_out = r_crit, 1.1r_crit

@@ -1,0 +1,109 @@
+from pyathena import *
+import matplotlib.pyplot as plt
+
+# default data reading
+
+filename='../bin/sntest/id0/n1_SN_Lx64_Nx64_rin5_TE_h_oct.0020.vtk'
+ds = AthenaDataSet(filename)
+
+print ds.domain
+print ds.grids
+
+fm = ds.domain['field_map']
+print fm.keys()
+
+den = ds.read_all_data('density') 
+v1,v2,v3 = ds.read_all_data('velocity')
+# C-like ordering. To access i,j,k data, use den[k,j,i] not den[i,j,k].
+
+# slice
+slice = AthenaSlice(ds,axis='z',field='density',center=(0,0,0))
+fig=plt.figure()
+ax=fig.add_subplot(111)
+ax.imshow(slice.data,extent=slice.bound,origin='lower')
+ax.set_xlabel(slice.axis_labels[0])
+ax.set_ylabel(slice.axis_labels[1])
+
+# simple analysis
+# total radial momentum
+# c-like
+import numpy as np
+
+Nx=ds.domain['Nx']
+pr=0.
+for k in range(Nx[2]):
+	for j in range(Nx[1]):
+		for i in range(Nx[0]):
+			x,y,z = cc_pos(ds.domain,[i,j,k])
+			r = np.sqrt(x**2+y**2+z**2)
+			vr = v1[k,j,i]*x/r+v2[k,j,i]*y/r+v3[k,j,i]*z/r
+			pr = pr + den[k,j,i]*vr
+
+# using array
+
+le=ds.domain['left_edge']
+re=ds.domain['right_edge']
+dx=ds.domain['dx']
+Nx=ds.domain['Nx']
+
+xarr=np.arange(le[0],re[0],dx[0])+0.5*dx[0]
+yarr=np.arange(le[1],re[1],dx[1])+0.5*dx[1]
+zarr=np.arange(le[2],re[2],dx[2])+0.5*dx[2]
+x3d=np.tile(xarr.reshape(1,1,Nx[0]),(Nx[2],Nx[1],1))
+y3d=np.tile(yarr.reshape(1,Nx[1],1),(Nx[2],1,Nx[0]))
+z3d=np.tile(zarr.reshape(Nx[2],1,1),(1,Nx[1],Nx[0]))
+r3d=np.sqrt(x3d**2+y3d**2+z3d**2)
+
+vr=v1*x3d/r3d+v2*y3d/r3d+v3*z3d/r3d
+pr=den*vr
+prtot=pr.sum()
+
+ax.cla()
+ax.plot(r3d.flatten(),vr.flatten(),'o')
+
+
+# handling history file
+#
+
+import ath_hst
+
+hstfilename='../bin/sntest/id0/n1_SN_Lx64_Nx64_rin5_TE_h_oct.hst'
+hst=ath_hst.read(hstfilename)
+print hst.keys()
+
+ax=plt.gca()
+ax.cla()
+ax.plot(hst['time'],hst['r_mom'])
+ax.plot(hst['time'],hst['rmom_hot'])
+ax.plot(hst['time'],hst['rmom_shell'])
+
+# converting to physical units
+#
+# downloaded from:
+# https://pypi.python.org/pypi/astropy
+# install for individual user:
+# python setup.py install --user
+#
+import astropy.constants as c
+import astropy.units as u
+
+dunit=1.4*c.m_p/u.cm**3
+lunit=u.pc
+vunit=u.km/u.s
+tunit=lunit/vunit
+
+vol=hst['vol']*c.pc**3
+time=(hst['time']*tunit).to('Myr')
+momentum=(hst['r_mom']*vol*dunit*vunit).to('Msun*km/s')
+
+ax=plt.gca()
+ax.cla()
+ax.plot(time,momentum*8) # we only simulated 1/8 volume
+
+# plot a point calculated from the vtk data
+t=(ds.domain['time']*tunit).to('Myr')
+mom=(prtot*dunit*(dx[0]*lunit)**3*vunit).to('Msun.km/s')
+ax.plot(t,mom*8,'r*')
+
+
+print mom,np.interp(t.value,time,momentum)
