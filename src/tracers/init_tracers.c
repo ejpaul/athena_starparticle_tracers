@@ -19,6 +19,7 @@
 #include "../globals.h"
 #include <float.h>
 #include <gsl/gsl_rng.h>
+#include <time.h>
 
 #if defined(MCTRACERS) || defined(VFTRACERS)/* endif at the end of the file */
 
@@ -29,7 +30,6 @@
 /* Current id */
 static double current_tracer;
 /* Current random array index */
-static gsl_rng *rng;
 
 /*=========================== PUBLIC FUNCTIONS ===============================*/
 /*----------------------------------------------------------------------------*/
@@ -174,7 +174,6 @@ void tracer_init_threshold(GridS *pG, Real rho) {
     int i, j, k;
     TracerListS *list;
     Real d;
-    int m;
     int n = par_geti("problem","N_proportional");
     is = pG->is;
     ie = pG->ie;
@@ -360,31 +359,13 @@ void tracer_debug(GridS *pG) {
 #ifdef VFTRACERS
 // Check that tracer is in the right cell
                     celli(pG, pnode->x1, cell1.x1, &i1, &a);
-                    if (i != i1) {
-                        printf("i = %d\n", i);
-                        printf("j = %d\n", j);
-                        printf("k = %d\n", k);
-                        printf("ie = %d\n", ie);
-                        printf("i1 = %d\n", i1);
-                        fflush(0);
-                        assert(i == i1);
-                    }
+                    assert(i == i1);
                     cellj(pG, pnode->x2, cell1.x2, &i2, &b);
-                    if (j != i2) {
-                        printf("j = %d\n", j);
-                        printf("i2 = %d\n", i2);
-                        fflush(0);
-                        assert(j == i2);
-                    }
-                    cellk(pG, pnode->x3, cell1.x2, &i3, &c);
-                    if (k != i3) {
-                        printf("k = %d\n", k);
-                        printf("i3 = %d\n", i3);
-                        fflush(0);
-                        assert(i == i1);
-                    }
+                    assert(j == i2);
+                    cellk(pG, pnode->x3, cell1.x3, &i3, &c);
+                    assert(k == i3);
 #endif /* VFTRACERS */
-                    count ++;
+                    count++;
                     pnode = pnode->Next;
                 }
                 assert(count == list->count);

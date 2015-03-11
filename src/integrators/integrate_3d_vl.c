@@ -1946,7 +1946,7 @@ void integrate_3d_vl(DomainS *pD)
  */
     
 #ifdef VFTRACERS
-    Integrate_vftracers(pD);
+    Integrate_vf_2nd(pD);
 #endif /* VFTRACERS */
     
 #if defined(MCTRACERS) || defined(VFTRACERS)

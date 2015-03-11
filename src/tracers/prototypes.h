@@ -40,10 +40,11 @@ void ran_gen(GridS *pG);
 
 /* vfintegrate.c */
 void vf_newijk(DomainS* pD);
-void Integrate_vftracers(DomainS *pD);
 void Integrate_vf_2nd(DomainS *pD);
+void Integrate_vf_2nd_lower(DomainS *pD);
 void vf_newpos(GridS *pG, TracerListS *list, TracerListS *newList);
 int  interp(GridS *pG, Real weight[3][3][3], int is, int js, int ks, Real *u1, Real *u2, Real *u3);
+int  interp_prev(GridS *pG, Real weight[3][3][3], int is, int js, int ks, Real *u1, Real *u2, Real *u3);
 
 /* bvals_tracer.c */
 void bvals_tracer(DomainS *pD);

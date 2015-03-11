@@ -120,10 +120,6 @@ void bvals_tracer(DomainS *pD) {
     
 #endif /* MPI_PARALLEL */
     
-#ifdef VFTRACERS
-    vf_newijk(pD);
-#endif
-    
     /*--- Step 1. ------------------------------------------------------------------
      * Boundary Conditions in x1-direction */
     if (pGrid->Nx[0] > 1){
@@ -1290,6 +1286,11 @@ static void pack_ix1_tracers(GridS *pG)
                 send_buf_mc0x1[l][2] = (double)tracer->hist->i_init;
                 send_buf_mc0x1[l][3] = (double)tracer->hist->j_init;
                 send_buf_mc0x1[l][4] = (double)tracer->hist->k_init;
+#ifdef VFTRACERS
+                send_buf_mc0x1[l][5] = (double)tracer->x1;
+                send_buf_mc0x1[l][6] = (double)tracer->x2;
+                send_buf_mc0x1[l][7] = (double)tracer->x3;
+#endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
                 tracer = Next;
@@ -1351,6 +1352,11 @@ static void pack_ox1_tracers(GridS *pG)
                 send_buf_mc1x1[l][2] = (double)tracer->hist->i_init;
                 send_buf_mc1x1[l][3] = (double)tracer->hist->j_init;
                 send_buf_mc1x1[l][4] = (double)tracer->hist->k_init;
+#ifdef VFTRACERS
+                send_buf_mc1x1[l][5] = (double)tracer->x1;
+                send_buf_mc1x1[l][6] = (double)tracer->x2;
+                send_buf_mc1x1[l][7] = (double)tracer->x3;
+#endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
                 tracer = Next;
@@ -1413,6 +1419,11 @@ static void pack_ix2_tracers(GridS *pG)
                 send_buf_mc0x2[l][2] = (double)tracer->hist->i_init;
                 send_buf_mc0x2[l][3] = (double)tracer->hist->j_init;
                 send_buf_mc0x2[l][4] = (double)tracer->hist->k_init;
+#ifdef VFTRACERS
+                send_buf_mc0x2[l][5] = (double)tracer->x1;
+                send_buf_mc0x2[l][6] = (double)tracer->x2;
+                send_buf_mc0x2[l][7] = (double)tracer->x3;
+#endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
                 tracer = Next;
@@ -1472,6 +1483,11 @@ static void pack_ox2_tracers(GridS *pG)
                 send_buf_mc1x2[l][2] = (double)tracer->hist->i_init;
                 send_buf_mc1x2[l][3] = (double)tracer->hist->j_init;
                 send_buf_mc1x2[l][4] = (double)tracer->hist->k_init;
+#ifdef VFTRACERS
+                send_buf_mc1x2[l][5] = (double)tracer->x1;
+                send_buf_mc1x2[l][6] = (double)tracer->x2;
+                send_buf_mc1x2[l][7] = (double)tracer->x3;
+#endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
                 tracer = Next;
@@ -1531,6 +1547,11 @@ static void pack_ix3_tracers(GridS *pG)
                 send_buf_mc0x3[l][2] = (double)tracer->hist->i_init;
                 send_buf_mc0x3[l][3] = (double)tracer->hist->j_init;
                 send_buf_mc0x3[l][4] = (double)tracer->hist->k_init;
+#ifdef VFTRACERS
+                send_buf_mc0x3[l][5] = (double)tracer->x1;
+                send_buf_mc0x3[l][6] = (double)tracer->x2;
+                send_buf_mc0x3[l][7] = (double)tracer->x3;
+#endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
                 tracer = Next;
@@ -1570,9 +1591,14 @@ static void pack_ox3_tracers(GridS *pG)
             while(tracer) {
                 send_buf_mc1x3[l][0] = (double)tracer->hist->id;
                 send_buf_mc1x3[l][1] = (double)tracer->hist->d_init;
-                send_buf_mc0x3[l][2] = (double)tracer->hist->i_init;
-                send_buf_mc0x3[l][3] = (double)tracer->hist->j_init;
-                send_buf_mc0x3[l][4] = (double)tracer->hist->k_init;
+                send_buf_mc1x3[l][2] = (double)tracer->hist->i_init;
+                send_buf_mc1x3[l][3] = (double)tracer->hist->j_init;
+                send_buf_mc1x3[l][4] = (double)tracer->hist->k_init;
+#ifdef VFTRACERS
+                send_buf_mc1x1[l][5] = (double)tracer->x1;
+                send_buf_mc1x1[l][6] = (double)tracer->x2;
+                send_buf_mc1x1[l][7] = (double)tracer->x3;
+#endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
                 tracer = Next;
@@ -1609,7 +1635,7 @@ static int pack_ox3_mc(GridS *pG)
     return n;
 }
 
-#endif
+#endif /* MPI_PARALLEL */
 
 static void periodic_ix1_mc(GridS *pG)
 {
@@ -1620,7 +1646,6 @@ static void periodic_ix1_mc(GridS *pG)
     TracerS *pnode;
     TracerListS *list, *newList;
 
-#ifdef MCTRACERS
     /* Move tracers from ghost zone into active zone */
     for (k=ks; k<=ke; k++) {
         for (j=js; j<=je; j++) {
@@ -1635,30 +1660,14 @@ static void periodic_ix1_mc(GridS *pG)
                     pnode->newList = newList;
                     pnode = pnode->Next;
                 }
+                /* Changes x position of tracer corresponding to new list */
+#ifdef VFTRACERS
+                vf_newpos(pG, list, newList);
+#endif /* VFTRACERS */
                 Tracerlist_sweep_bc(list);
             }
         }
     }
-#endif
-    
-#ifdef VFTRACERS
-    for (k=ks; k<=ke; k++) {
-        for (j=js; j<=je; j++) {
-            /* Tracer list to move */
-            list = &((pG->GridLists)[k][j][is-1]);
-            /* List in active zone */
-            newList = &((pG->GridLists)[k][j][ie]);
-            pnode = list->Head;
-            /* flag tracers for movement */
-            while(pnode) {
-                pnode->newList = newList;
-                pnode = pnode->Next;
-            }
-            vf_newpos(pG, list, newList);
-            Tracerlist_sweep_bc(list);
-        }
-    }
-#endif
     return;
 }
 
@@ -1671,7 +1680,6 @@ static void periodic_ox1_mc(GridS *pG)
     TracerS *pnode;
     TracerListS *list, *newList;
     
-#ifdef MCTRACERS
     for (k=ks; k<=ke; k++) {
         for (j=js; j<=je; j++) {
             for (i=1; i<=nghost; i++) {
@@ -1686,33 +1694,14 @@ static void periodic_ox1_mc(GridS *pG)
                     pnode->newList = newList;
                     pnode = pnode->Next;
                 }
+#ifdef VFTRACERS
+                vf_newpos(pG, list, newList);
+#endif /* VFTRACERS */
                 /* Move tracers */
                 Tracerlist_sweep_bc(list);
             }
         }
     }
-#endif
-    
-#ifdef VFTRACERS
-    for (k=ks; k<=ke; k++) {
-        for (j=js; j<=je; j++) {
-            /* Tracer list to move */
-            list = &((pG->GridLists)[k][j][ie+1]);
-            /* List in active zone */
-            newList = &((pG->GridLists)[k][j][is]);
-            pnode = list->Head;
-            
-            /* flag tracers for movement */
-            while(pnode) {
-                pnode->newList = newList;
-                pnode = pnode->Next;
-            }
-            vf_newpos(pG, list, newList);
-            /* Move tracers */
-            Tracerlist_sweep_bc(list);
-        }
-    }
-#endif
     return;
 }
 
@@ -1725,7 +1714,6 @@ static void periodic_ix2_mc(GridS *pG)
     TracerS *pnode;
     TracerListS *list, *newList;
     
-#ifdef MCTRACERS
     for (k=ks; k<=ke; k++) {
         for (j=1; j<=nghost; j++) {
             for (i=is-nghost; i<=ie+nghost; i++) {
@@ -1739,31 +1727,14 @@ static void periodic_ix2_mc(GridS *pG)
                     pnode->newList = newList;
                     pnode = pnode->Next;
                 }
+#ifdef VFTRACERS
+                vf_newpos(pG, list, newList);
+#endif /* VFTRACERS */
                 /* Move tracers */
                 Tracerlist_sweep_bc(list);
             }
         }
     }
-#endif
-#ifdef VFTRACERS
-    for (k=ks; k<=ke; k++) {
-        for (i=is; i<=ie; i++) {
-            /* Tracer list to move (from ghost zone) */
-            list = &((pG->GridLists)[k][js-1][i]);
-            /* List in active zone */
-            newList = &((pG->GridLists)[k][je][i]);
-            pnode = list->Head;
-            /* flag tracers for movement */
-            while(pnode) {
-                pnode->newList = newList;
-                pnode = pnode->Next;
-            }
-            vf_newpos(pG, list, newList);
-            /* Move tracers */
-            Tracerlist_sweep_bc(list);
-        }
-    }
-#endif
     return;
 }
 
@@ -1775,7 +1746,7 @@ static void periodic_ox2_mc(GridS *pG)
     int i,j,k;
     TracerS *pnode;
     TracerListS *list, *newList;
-#ifdef MCTRACERS
+    
     for (k=ks; k<=ke; k++) {
         for (j=1; j<=nghost; j++) {
             for (i=is-nghost; i<=ie+nghost; i++) {
@@ -1791,32 +1762,14 @@ static void periodic_ox2_mc(GridS *pG)
                     pnode->newList = newList;
                     pnode = pnode->Next;
                 }
+#ifdef VFTRACERS
+                vf_newpos(pG, list, newList);
+#endif /* VFTRACERS */
                 /* Move tracers */
                 Tracerlist_sweep_bc(list);
             }
         }
     }
-#endif
-    
-#ifdef VFTRACERS
-    for (k=ks; k<=ke; k++) {
-        for (i=is; i<=ie; i++) {
-            /* Tracer list to move (from ghost zone) */
-            list = &((pG->GridLists)[k][je+1][i]);
-            /* List in active zone */
-            newList = &((pG->GridLists)[k][js][i]);
-            pnode = list->Head;
-            /* flag tracers for movement */
-            while(pnode) {
-                pnode->newList = newList;
-                pnode = pnode->Next;
-            }
-            vf_newpos(pG, list, newList);
-            /* Move tracers */
-            Tracerlist_sweep_bc(list);
-        }
-    }
-#endif
     return;
 }
 
@@ -1829,7 +1782,6 @@ static void periodic_ix3_mc(GridS *pG)
     TracerS *pnode;
     TracerListS *list, *newList;
     
-#ifdef MCTRACERS
     for (k=1; k<=nghost; k++) {
         for (j=js-nghost; j<=je+nghost; j++) {
             for (i=is-nghost; i<=ie+nghost; i++) {
@@ -1844,31 +1796,14 @@ static void periodic_ix3_mc(GridS *pG)
                     pnode->newList = newList;
                     pnode = pnode->Next;
                 }
+#ifdef VFTRACERS
+                vf_newpos(pG, list, newList);
+#endif /* VFTRACERS */
                 /* Move tracers */
                 Tracerlist_sweep_bc(list);
             }
         }
     }
-#endif
-#ifdef VFTRACERS
-    for (j=js; j<=je; j++) {
-        for (i=is; i<=ie; i++) {
-            /* Tracer list to move (from ghost zone) */
-            list = &((pG->GridLists)[ks-1][j][i]);
-            /* List in active zone */
-            newList = &((pG->GridLists)[ke][j][i]);
-            pnode = list->Head;
-            /* flag tracers for movement */
-            while(pnode) {
-                pnode->newList = newList;
-                pnode = pnode->Next;
-            }
-            vf_newpos(pG, list, newList);
-            /* Move tracers */
-            Tracerlist_sweep_bc(list);
-        }
-    }
-#endif
     return;
 }
 
@@ -1881,7 +1816,6 @@ static void periodic_ox3_mc(GridS *pG)
     TracerS *pnode;
     TracerListS *list, *newList;
     
-#ifdef MCTRACERS
     for (k=1; k<=nghost; k++) {
         for (j=js-nghost; j<=je+nghost; j++) {
             for (i=is-nghost; i<=ie+nghost; i++) {
@@ -1895,31 +1829,14 @@ static void periodic_ox3_mc(GridS *pG)
                     pnode->newList = newList;
                     pnode = pnode->Next;
                 }
+#ifdef VFTRACERS
+                vf_newpos(pG, list, newList);
+#endif /* VFTRACERS */
                 /* Move tracers */
                 Tracerlist_sweep_bc(list);
             }
         }
     }
-#endif
-#ifdef VFTRACERS
-    for (j=js; j<=je; j++) {
-        for (i=is; i<=ie; i++) {
-            /* Tracer list to move (from ghost zone) */
-            list = &((pG->GridLists)[ke+1][j][i]);
-            /* List in active zone */
-            newList = &((pG->GridLists)[ks][j][i]);
-            pnode = list->Head;
-            /* flag tracers for movement */
-            while(pnode) {
-                pnode->newList = newList;
-                pnode = pnode->Next;
-            }
-            vf_newpos(pG, list, newList);
-            /* Move tracers */
-            Tracerlist_sweep_bc(list);
-        }
-    }
-#endif
     return;
 }
 
@@ -1951,6 +1868,11 @@ static void unpack_ix1_mc(GridS *pG)
                 hist->i_init = (int)recv_buf_mc0x1[m][2];
                 hist->j_init = (int)recv_buf_mc0x1[m][3];
                 hist->k_init = (int)recv_buf_mc0x1[m][4];
+#ifdef VFTRACERS
+                tracer->x1 = (double)recv_buf_mc0x1[m][5];
+                tracer->x2 = (double)recv_buf_mc0x1[m][6];
+                tracer->x3 = (double)recv_buf_mc0x1[m][7];
+#endif
                 tracer->hist = hist;
                 mclist_add(list,tracer);
                 m++;
@@ -1987,6 +1909,11 @@ static void unpack_ox1_mc(GridS *pG)
                 hist->i_init = (int)recv_buf_mc1x1[m][2];
                 hist->j_init = (int)recv_buf_mc1x1[m][3];
                 hist->k_init = (int)recv_buf_mc1x1[m][4];
+#ifdef VFTRACERS
+                tracer->x1 = (double)recv_buf_mc1x1[m][5];
+                tracer->x2 = (double)recv_buf_mc1x1[m][6];
+                tracer->x3 = (double)recv_buf_mc1x1[m][7];
+#endif
                 tracer->hist = hist;
                 mclist_add(list,tracer);
                 m++;
@@ -2022,6 +1949,11 @@ static void unpack_ix2_mc(GridS *pG)
                 hist->i_init = (int)recv_buf_mc0x2[m][2];
                 hist->j_init = (int)recv_buf_mc0x2[m][3];
                 hist->k_init = (int)recv_buf_mc0x2[m][4];
+#ifdef VFTRACERS
+                tracer->x1 = (double)recv_buf_mc0x2[m][5];
+                tracer->x2 = (double)recv_buf_mc0x2[m][6];
+                tracer->x3 = (double)recv_buf_mc0x2[m][7];
+#endif
                 tracer->hist = hist;
                 mclist_add(list,tracer);
                 m++;
@@ -2057,6 +1989,11 @@ static void unpack_ox2_mc(GridS *pG)
                 hist->i_init = (int)recv_buf_mc1x2[m][2];
                 hist->j_init = (int)recv_buf_mc1x2[m][3];
                 hist->k_init = (int)recv_buf_mc1x2[m][4];
+#ifdef VFTRACERS
+                tracer->x1 = (double)recv_buf_mc1x2[m][5];
+                tracer->x2 = (double)recv_buf_mc1x2[m][6];
+                tracer->x3 = (double)recv_buf_mc1x2[m][7];
+#endif
                 tracer->hist = hist;
                 mclist_add(list,tracer);
                 m++;
@@ -2092,6 +2029,11 @@ static void unpack_ix3_mc(GridS *pG)
                 hist->i_init = (int)recv_buf_mc0x3[m][2];
                 hist->j_init = (int)recv_buf_mc0x3[m][3];
                 hist->k_init = (int)recv_buf_mc0x3[m][4];
+#ifdef VFTRACERS
+                tracer->x1 = (double)recv_buf_mc0x3[m][5];
+                tracer->x2 = (double)recv_buf_mc0x3[m][6];
+                tracer->x3 = (double)recv_buf_mc0x3[m][7];
+#endif
                 tracer->hist = hist;
                 mclist_add(list,tracer);
                 m++;
@@ -2127,6 +2069,11 @@ static void unpack_ox3_mc(GridS *pG)
                 hist->i_init = (int)recv_buf_mc1x3[m][2];
                 hist->j_init = (int)recv_buf_mc1x3[m][3];
                 hist->k_init = (int)recv_buf_mc1x3[m][4];
+#ifdef VFTRACERS
+                tracer->x1 = (double)recv_buf_mc1x3[m][5];
+                tracer->x2 = (double)recv_buf_mc1x3[m][6];
+                tracer->x3 = (double)recv_buf_mc1x3[m][7];
+#endif
                 tracer->hist = hist;
                 mclist_add(list, tracer);
                 m++;

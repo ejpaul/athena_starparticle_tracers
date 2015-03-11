@@ -713,9 +713,9 @@ int main(int argc, char *argv[])
             
 #if defined(VFTRACERS) || defined(MCTRACERS)
           bvals_tracer(&(Mesh.Domain[nl][nd]));
-#ifdef VFTRACERS
-          vf_newijk(&(Mesh.Domain[nl][nd]));
-#endif /* VFTRACERS */
+//#ifdef VFTRACERS
+//          vf_newijk(&(Mesh.Domain[nl][nd]));
+//#endif /* VFTRACERS */
 #endif /* TRACERS */
         }
       }

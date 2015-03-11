@@ -31,10 +31,6 @@ void problem(DomainS *pDomain)
   Real pressure,drat,prat,rad,pa,da,x1,x2,x3;
   Real b0=0.0,Bx=0.0,rin;
   double theta;
-#ifdef MCTRACERS
-  MClistS *list;
-  int n;
-#endif /* MCTRACERS */
 
   rin = par_getd("problem","radius");
   pa  = par_getd("problem","pamb");
@@ -73,11 +69,6 @@ void problem(DomainS *pDomain)
         U1d = Prim1D_to_Cons1D(&(W),&Bx);
 
 	pGrid->U[k][j][i].d  = U1d.d;
-#ifdef MCTRACERS
-    list = &((pGrid->GridLists)[k][j][i]);
-    n = U1d.d*10;
-    init_mctracer_list(list, n, U1d.d);
-#endif
 	pGrid->U[k][j][i].M1 = U1d.Mx;
 	pGrid->U[k][j][i].M2 = U1d.My;
 	pGrid->U[k][j][i].M3 = U1d.Mz;
@@ -106,6 +97,13 @@ void problem(DomainS *pDomain)
 #endif
     
     mc_init_unif(pGrid);
+    
+#if defined(MCTRACERS) || defined(VFTRACERS)
+    if (strcmp(par_gets("problem","distribution"), "uniform") == 0)
+        tracer_init_unif(pGrid);
+    else if (strcmp(par_gets("problem","distribution"), "prop") == 0)
+        tracer_init_proportional(pGrid);
+#endif // TRACERS //
 
 }
 
@@ -120,19 +118,26 @@ void problem(DomainS *pDomain)
  * Userwork_after_loop     - problem specific work AFTER  main loop
  *----------------------------------------------------------------------------*/
 
-#ifdef MCTRACERS
+#if defined(MCTRACERS) || defined(VFTRACERS)
 static Real num_density(const GridS *pG, const int i, const int j, const int k)
 {
     Real count = (Real) (pG->GridLists)[k][j][i].count;
     return count;
 }
+#endif /* TRACERS */
 
+
+#ifdef MCTRACERS
+#ifdef TOPHAT
 static Real top_hat(const GridS *pG, const int i, const int j, const int k)
 {
     Real count = (Real) (pG->TopHatGrid)[k][j][i].count;
     return count;
 }
+#endif /* TOPHAT */
+#endif // MCTRACERS //
 
+#if defined(VFTRACERS) || defined(MCTRACERS)
 static Real ratio_map(const GridS *pG, const int i, const int j, const int k)
 {
     Real count = (Real) (pG->GridLists)[k][j][i].count;
@@ -140,20 +145,43 @@ static Real ratio_map(const GridS *pG, const int i, const int j, const int k)
     Real ratio = (Real) count/d;
     return ratio;
 }
+#endif // TRACERS //
 
+#if defined(MCTRACERS) || defined(VFTRACERS)
 static Real d_init(const GridS *pG, const int i, const int j, const int k)
 {
-    Real d = 0;
-    int n = 0;
-    MCtracerS *tracer = pG->GridLists[k][j][i].Head;
+    Real d = 0.0;
+    Real n = 0.0;
+    TracerS *tracer = pG->GridLists[k][j][i].Head;
     while (tracer) {
         n++;
         d += tracer->hist->d_init;
         tracer = tracer->Next;
     }
-    return d/n;
+    if (n != 0){
+        return d/n;
+    }
+    else return 0;
 }
-#endif /* MCTRACERS */
+#endif // MCTRACERS //
+
+#if defined(MCTRACERS) || defined(VFTRACERS)
+static Real i_init(const GridS *pG, const int i, const int j, const int k)
+{
+    Real d = 0.0;
+    Real n = 0.0;
+    TracerS *tracer = pG->GridLists[k][j][i].Head;
+    while (tracer) {
+        n++;
+        d += tracer->hist->d_init;
+        tracer = tracer->Next;
+    }
+    if (n != 0){
+        return d/n;
+    }
+    else return 0;
+}
+#endif // TRACERS //
 
 void problem_write_restart(MeshS *pM, FILE *fp)
 {
@@ -167,13 +195,12 @@ void problem_read_restart(MeshS *pM, FILE *fp)
 
 ConsFun_t get_usr_expr(const char *expr)
 {
-#ifdef MCTRACERS
-    if(strcmp(expr, "MC_num")==0) return num_density;
-    if(strcmp(expr, "MC_tophat")==0) return top_hat;
-    if(strcmp(expr, "ratio_map")==0) return ratio_map;
+#if defined(MCTRACERS) || defined(VFTRACERS)
+    if(strcmp(expr, "num_density")==0) return num_density;
     if(strcmp(expr, "d_init")==0) return d_init;
-#endif
-  return NULL;
+    if(strcmp(expr, "ratio_map")==0) return d_init;
+#endif /* TRACERS */
+    return NULL;
 }
 
 VOutFun_t get_usr_out_fun(const char *name){

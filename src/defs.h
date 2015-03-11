@@ -20,10 +20,10 @@
  *  (user modified via configure) */
 
 /* Version identifier when configure was last run */
-#define CONFIGURE_DATE "Mon Dec  1 09:40:32 EST 2014"
+#define CONFIGURE_DATE "Tue Mar 10 22:51:20 EDT 2015"
 
 /* Problem generator with which Athena is compiled */
-#define A_PROBLEM "advect_2D"
+#define A_PROBLEM "blast_mc"
 
 /* HYDRO or MHD */
 #define MHD
@@ -91,7 +91,7 @@
 #define DOUBLE_PREC
 
 /* debug mode: DEBUG or OPTIMIZE */
-#define OPTIMIZE
+#define DEBUG
 
 /* Write ghost cells in outputs: WRITE_GHOST_CELLS or NO_WRITE_GHOST_CELLS */
 #define NO_WRITE_GHOST_CELLS

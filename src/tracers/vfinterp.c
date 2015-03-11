@@ -7,6 +7,7 @@
 #include "prototypes.h"
 #include "tracers.h"
 #include "../globals.h"
+
 #ifdef VFTRACERS
 /*----------------------------------------------------------------------------*/
 /*! \fn void getwei_linear(GridS *pG, Real x1, Real x2, Real x3,
@@ -92,7 +93,7 @@ void getwei_linear(GridS *pG, Real x1, Real x2, Real x3, Real3Vect cell1,
 void getwei_TSC(GridS *pG, Real x1, Real x2, Real x3, Real3Vect cell1,
                 Real weight[3][3][3], int *is, int *js, int *ks)
 {
-    int i, j, k, i1, j1, k1;
+    int i, j, k;
     Real a, b, c, d;	/* grid coordinate for the position (x1,x2,x3) */
     Real wei1[3], wei2[3], wei3[3];/* weight function in x1,x2,x3 directions */
     
@@ -166,7 +167,7 @@ void getwei_TSC(GridS *pG, Real x1, Real x2, Real x3, Real3Vect cell1,
 void getwei_QP(GridS *pG, Real x1, Real x2, Real x3, Real3Vect cell1,
                Real weight[3][3][3], int *is, int *js, int *ks)
 {
-    int i, j, k, i1, j1, k1;
+    int i, j, k;
     Real a, b, c, d;	/* grid coordinate for the position (x1,x2,x3) */
     Real wei1[3], wei2[3], wei3[3];/* weight function in x1,x2,x3 directions */
     
@@ -224,4 +225,4 @@ void getwei_QP(GridS *pG, Real x1, Real x2, Real x3, Real3Vect cell1,
     
     return;
 }
-#endif
+#endif /* VFTRACERS */

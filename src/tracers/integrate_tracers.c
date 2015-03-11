@@ -37,7 +37,6 @@ static gsl_rng *rng;
 /*----------------------------------------------------------------------------*/
 void ran_gen(GridS *pG) {
 
-    int i, j, n1z, n2z;
     long s = time(NULL);
     int pid = myID_Comm_world;
     
@@ -58,7 +57,6 @@ void ran_gen(GridS *pG) {
 /*----------------------------------------------------------------------------*/
 void ran_gen_list(GridS *pG) {
     
-    int i, j, n1z, n2z;
 //    seed = 0;
 //    rng = gsl_rng_alloc(gsl_rng_mt19937);
 //    gsl_rng_set(rng, seed);

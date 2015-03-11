@@ -17,7 +17,7 @@ MACHINE = default
 
 CC  = gcc
 LDR = gcc
-OPT = -O3
+OPT = -g -Wall -W -std=c99 -pedantic
 CUSTLIBS =
 MPIINC =
 MPILIB =

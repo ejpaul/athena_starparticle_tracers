@@ -1298,13 +1298,20 @@ void integrate_2d_vl(DomainS *pD)
 #endif /* FIRST_ORDER_FLUX_CORRECTION */
     
 /*--------------------------------------------------------------------
-* Sweep through MCtracer lists and move tracers marked for transfer
-*/
+ * Integrate vftracers and move to corresponding new list
+ */
 
 #ifdef VFTRACERS
-//    Integrate_vftracers(pD);
-    Integrate_vf_2nd(pD);
+    /* Move tracers to new integrated position */
+//    Integrate_vf_2nd(pD);
+    Integrate_vf_2nd_lower(pD);
+    /* Move tracers to list corresponding to new position */
+    vf_newijk(pD);
 #endif
+    
+/*--------------------------------------------------------------------
+ * Sweep through MCtracer lists and move tracers marked for transfer
+ */
     
 #if defined(MCTRACERS) || defined(VFTRACERS)
     for (j=js; j<=je; j++) {

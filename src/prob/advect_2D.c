@@ -62,14 +62,14 @@ void problem(DomainS *pDomain)
  * Userwork_after_loop     - problem specific work AFTER  main loop
  *----------------------------------------------------------------------------*/
 
-
+#if defined(MCTRACERS) || defined(VFTRACERS)
 static Real num_density(const GridS *pG, const int i, const int j, const int k)
 {
-#if defined(MCTRACERS) || defined(VFTRACERS)
     Real count = (Real) (pG->GridLists)[k][j][i].count;
-#endif /* TRACERS */
     return count;
 }
+#endif /* TRACERS */
+
 
 #ifdef MCTRACERS
 #ifdef TOPHAT
@@ -79,7 +79,9 @@ static Real top_hat(const GridS *pG, const int i, const int j, const int k)
     return count;
 }
 #endif /* TOPHAT */
+#endif // MCTRACERS //
 
+#if defined(VFTRACERS) || defined(MCTRACERS)
 static Real ratio_map(const GridS *pG, const int i, const int j, const int k)
 {
     Real count = (Real) (pG->GridLists)[k][j][i].count;
@@ -87,7 +89,7 @@ static Real ratio_map(const GridS *pG, const int i, const int j, const int k)
     Real ratio = (Real) count/d;
     return ratio;
 }
-#endif // MCTRACERS //
+#endif // TRACERS //
 
 #if defined(MCTRACERS) || defined(VFTRACERS)
 static Real d_init(const GridS *pG, const int i, const int j, const int k)
@@ -140,6 +142,7 @@ ConsFun_t get_usr_expr(const char *expr)
 #if defined(MCTRACERS) || defined(VFTRACERS)
     if(strcmp(expr, "num_density")==0) return num_density;
     if(strcmp(expr, "d_init")==0) return d_init;
+    if(strcmp(expr, "ratio_map")==0) return d_init;
 #endif /* TRACERS */
     return NULL;
 }

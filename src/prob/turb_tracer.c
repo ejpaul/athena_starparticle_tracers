@@ -984,6 +984,30 @@ static void perturb(GridS *pG)
     return;
 }
 
+/*  */
+void tracer_stars(const GridS *pG)
+{
+#ifdef STARPARTICLE
+    StarParListS *pList=NULL;
+    StarParS *pStar=NULL;
+    
+    int ip,jp,kp;
+    Real x1,x2,x3;
+    
+    pList = pG->Lstars;
+    while (pList) {
+        pStar = &(pList->starpar);
+        cc_ijk(pG,pStar->x1,pStar->x2,pStar->x3,&ip,&jp,&kp);
+        /* If particle in this cell */
+        if (i==ip && j==jp && k==kp) {
+            return pStar->m/(pG->dx1*pG->dx2*pG->dx3);
+        }
+        pList = pList->next;
+    }
+#endif
+    return 0.0;
+}
+
 /*------------------------------------------------------------------------------
  *  Function initialize
  *

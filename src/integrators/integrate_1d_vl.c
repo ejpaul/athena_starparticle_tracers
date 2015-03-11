@@ -523,7 +523,7 @@ void integrate_1d_vl(DomainS *pD)
      */
     
 #ifdef VFTRACERS
-    Integrate_vftracers(pD);
+    Integrate_vf_2nd(pD);
 #endif
     
 #if defined(MCTRACERS) || defined(VFTRACERS)
