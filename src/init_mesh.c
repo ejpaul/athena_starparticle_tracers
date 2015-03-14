@@ -839,19 +839,6 @@ void init_mesh(MeshS *pM)
     if (ierr != MPI_SUCCESS)
         ath_error("[init_mesh]: Error calling MPI_Type_commit!\n");
     
-    int size;
-    MPI_Type_size(pD->LISTTYPE, &size);
-    printf("size of pD->LISTTYPE = %d\n", size);
-    size = sizeof(TracerList_MPI);
-    printf("size of TracerList_MPI = %d\n", size);
-    
-    MPI_Type_size(pD->TRACERTYPE, &size);
-    printf("size of pD->TRACERTYPE = %d\n", size);
-    size = sizeof(Tracer_MPI);
-    printf("size of Tracer_MPI = %d\n", size);
-    fflush(0);
-    
-    
 #endif /* TRACERS */
  
 #endif /* MPI_PARALLEL */

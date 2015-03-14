@@ -40,7 +40,7 @@ CORE_OBJ = ath_array.o \
            perturb.o
 
 FFT_OBJ =
-ifeq (FFT_ENABLED,FFT_ENABLED)
+ifeq (NO_FFT,FFT_ENABLED)
 ifeq (NO_MPI_PARALLEL,MPI_PARALLEL)
    FFT_OBJ = fftsrc/factor.o \
              fftsrc/fft_2d.o \

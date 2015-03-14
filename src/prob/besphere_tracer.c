@@ -208,6 +208,32 @@ void Userwork_in_loop(MeshS *pM)
 
 /* ========================================================================== */
 
+#if defined(MCTRACERS) || defined(VFTRACERS)
+static Real d_init(const GridS *pG, const int i, const int j, const int k)
+{
+  Real d = 0.0;
+  Real n = 0.0;
+  TracerS *tracer = pG->GridLists[k][j][i].Head;
+  while (tracer) {
+    n++;
+    d += tracer->prop->d_init;
+    tracer = tracer->Next;
+  }
+  if (n != 0){
+    return d/n;
+  }
+  else return 0;
+}
+#endif // MCTRACERS //
+
+#if defined(MCTRACERS) || defined(VFTRACERS)
+static Real num_density(const GridS *pG, const int i, const int j, const int k)
+{
+  Real count = (Real) (pG->GridLists)[k][j][i].count;
+  return count;
+}
+#endif /* TRACERS */
+
 void Userwork_after_loop(MeshS *pM)
 {
   /* Don't free memory here if doing any analysis because final
@@ -225,6 +251,11 @@ void problem_read_restart(MeshS *pM, FILE *fp)
 
 ConsFun_t get_usr_expr(const char *expr)
 {
+#if defined(MCTRACERS) || defined(VFTRACERS)
+  if(strcmp(expr, "num_density")==0) return num_density;
+  if(strcmp(expr, "d_init")==0) return d_init;
+  if(strcmp(expr, "ratio_map")==0) return d_init;
+#endif /* TRACERS */
   return NULL;
 }
 

@@ -165,7 +165,7 @@ void integrate_2d_vl(DomainS *pD)
     for (i=is-nghost; i<=ie+nghost; i++) {
 #ifdef VFTRACERS
       pG->U_prev[ks][j][i] = pG->U[ks][j][i];
-#endif
+#endif /* VFTRACERS */
       Uhalf[j][i] = pG->U[ks][j][i];
 #ifdef MHD
       B1_x1Face[j][i] = pG->B1i[ks][j][i];

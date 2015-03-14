@@ -17,7 +17,7 @@ MACHINE = default
 
 CC  = gcc
 LDR = gcc
-OPT = -O3
+OPT = -g -Wall -W -std=c99 -pedantic
 CUSTLIBS =
 MPIINC =
 MPILIB =
@@ -27,7 +27,7 @@ BLOCKINC =
 BLOCKLIB = 
 CUSTLIBS = -ldl -lm
 
-ifeq (FFT_ENABLED,FFT_ENABLED)
+ifeq (NO_FFT,FFT_ENABLED)
   BLOCKINC = -I fftsrc
   FFTWLIB = -lfftw3
   FFTWINC = 
@@ -38,11 +38,11 @@ ifeq (NO_MPI_PARALLEL,MPI_PARALLEL)
   LDR = mpicc 
 endif
 
-ifeq (MCTRACERS, MCTRACERS)
+ifeq (NO_MCTRACERS, MCTRACERS)
     TRACERLIB = -L/usr/local/lib -lgsl -lgslcblas
     TRACERINC = -I/usr/local/include
 else
-ifeq (NO_VFTRACERS, VFTRACERS)
+ifeq (VFTRACERS, VFTRACERS)
     TRACERLIB = -L/usr/local/lib -lgsl -lgslcblas
     TRACERINC = -I/usr/local/include
 endif
@@ -133,7 +133,7 @@ ifeq (NO_MPI_PARALLEL,NO_MPI_PARALLEL)
   MPIINC = 
   MPILIB = 
 endif
-ifeq (FFT_ENABLED,NO_FFT)
+ifeq (NO_FFT,NO_FFT)
   FFTWINC = 
   FFTWLIB = 
 endif

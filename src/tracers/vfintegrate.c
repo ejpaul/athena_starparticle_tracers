@@ -89,13 +89,13 @@ void Integrate_vf_2nd(DomainS *pD)
                     
                     /* 2nd order method */
                     if (pG->Nx[0] > 1) {
-                        curr->x1 += 0.5*pG->dt*(0.25*vp1_prev + 0.75*vp1);
+                        curr->x1 = xp1 + 0.5*pG->dt*(0.25*vp1_prev + 0.75*vp1);
                     }
                     if (pG->Nx[1] > 1) {
-                        curr->x2 += 0.5*pG->dt*(0.25*vp2_prev + 0.75*vp2);
+                        curr->x2 = xp2 + 0.5*pG->dt*(0.25*vp2_prev + 0.75*vp2);
                     }
                     if (pG->Nx[2] > 1) {
-                        curr->x3 += 0.5*pG->dt*(0.25*vp3_prev + 0.75*vp3);
+                        curr->x3 = xp3 + 0.5*pG->dt*(0.25*vp3_prev + 0.75*vp3);
                     }
                     curr = curr->Next;
                 }

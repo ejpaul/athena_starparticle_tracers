@@ -20,17 +20,17 @@
  *  (user modified via configure) */
 
 /* Version identifier when configure was last run */
-#define CONFIGURE_DATE "Fri Mar 13 21:57:32 EDT 2015"
+#define CONFIGURE_DATE "Sat Mar 14 17:35:37 EDT 2015"
 
 /* Problem generator with which Athena is compiled */
-#define A_PROBLEM "besphere_tracer"
+#define A_PROBLEM "advect_2d"
 
 /* HYDRO or MHD */
-#define HYDRO
+#define MHD
 
 /* ADIABATIC or ISOTHERMAL or ... */
-#define ISOTHERMAL
-#define EOS_STR "ISOTHERMAL"
+#define ADIABATIC
+#define EOS_STR "ADIABATIC"
 
 #if defined(ISOTHERMAL) /* || defined PIECEWISE_POLYTROPE ... */
 #define BAROTROPIC        /* P = P(rho) */
@@ -45,21 +45,21 @@
 #define NSCALARS 0
 
 /* Monte Carlo Tracers */
-#define MCTRACERS
+#define NO_MCTRACERS
 
 /* Velocity Field Tracers */
-#define NO_VFTRACERS
+#define VFTRACERS
 
 /* Self-gravity */
-#define SELF_GRAVITY
-#define SELF_GRAVITY_USING_FFT_OBC
+#define NO_SELF_GRAVITY
+#define SELF_GRAVITY_NONE
 
 /* Particles */
 #define NO_PARTICLES
 #define NO_FEEDBACK
 
 /* Star-particles */
-#define STAR_PARTICLE
+#define NO_STAR_PARTICLE
 #define NO_STRICT_STARPARTICLE_CREATION
 
 /* implicit cooling */
@@ -81,7 +81,7 @@
 /* flux type
  * ROE_FLUX, HLLE_FLUX, HLLC_FLUX, HLLD_FLUX, FORCE_FLUX, EXACT_FLUX,
  * TWO_SHOCK_FLUX */
-#define HLLC_FLUX
+#define ROE_FLUX
 
 /* unsplit integrator:
  * CTU_INTEGRATOR or VL_INTEGRATOR */
@@ -91,7 +91,7 @@
 #define DOUBLE_PREC
 
 /* debug mode: DEBUG or OPTIMIZE */
-#define OPTIMIZE
+#define DEBUG
 
 /* Write ghost cells in outputs: WRITE_GHOST_CELLS or NO_WRITE_GHOST_CELLS */
 #define NO_WRITE_GHOST_CELLS
@@ -103,7 +103,7 @@
 #define NO_H_CORRECTION
 
 /* FFT mode: FFT_ENABLED or NO_FFT */
-#define FFT_ENABLED
+#define NO_FFT
 
 /* shearing-box: SHEARING_BOX or NO_SHEARING_BOX */
 #define NO_SHEARING_BOX

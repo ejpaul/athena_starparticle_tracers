@@ -875,9 +875,7 @@ void bvals_tracer(DomainS *pD) {
     if (send_rq) free_1d_array(send_rq);
     
 #endif /* MPI_PARALLEL */
-    
-    printf("END MPI SECTION\n");
-    fflush(0);
+
     return;
 }
 

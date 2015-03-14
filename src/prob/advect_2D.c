@@ -20,8 +20,8 @@ void problem(DomainS *pDomain)
             for (i=is; i<=ie; i++) {
                 if (((i-50)*(i-50) + (j-50)*(j-50)) <= 100) {
                     pGrid->U[k][j][i].d  = 2;
-                    pGrid->U[k][j][i].M1 = 0;
-                    pGrid->U[k][j][i].M2 = 2;
+                    pGrid->U[k][j][i].M1 = 2;
+                    pGrid->U[k][j][i].M2 = 0;
                     pGrid->U[k][j][i].M3 = 0;
                     pGrid->U[k][j][i].E = 1.0;
                     pGrid->U[k][j][i].B1c = 0;
@@ -30,8 +30,8 @@ void problem(DomainS *pDomain)
                 }
                 else {
                     pGrid->U[k][j][i].d  = 1;
-                    pGrid->U[k][j][i].M1 = 0;
-                    pGrid->U[k][j][i].M2 = 1;
+                    pGrid->U[k][j][i].M1 = 1;
+                    pGrid->U[k][j][i].M2 = 0;
                     pGrid->U[k][j][i].M3 = 0;
                     pGrid->U[k][j][i].E = 0.5;
                     pGrid->U[k][j][i].B1c = 0;

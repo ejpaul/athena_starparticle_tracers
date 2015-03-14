@@ -29,7 +29,6 @@
 
 /* Current id */
 static double current_tracer;
-/* Current random array index */
 
 /*=========================== PUBLIC FUNCTIONS ===============================*/
 /*----------------------------------------------------------------------------*/
@@ -114,7 +113,7 @@ void init_tracer_grid(MeshS *pM)
 #ifdef MCTRACERS
                 list->Rmass = pG->U[k][j][i].d;
                 list->currTail = NULL;
-#endif
+#endif /* MCTRACERS */
                 /* Initialize position of grid cell */
                 list->i = i;
                 list->j = j;
@@ -212,7 +211,6 @@ void tracer_init_proportional(GridS *pG) {
     int i, j, k;
     TracerListS *list;
     Real d;
-    int m;
     int n = par_geti("problem","N_proportional");
     is = pG->is;
     ie = pG->ie;
@@ -234,11 +232,10 @@ void tracer_init_proportional(GridS *pG) {
                 list->Head = NULL;
                 list->Tail = NULL;
                 d = pG->U[k][j][i].d;
-                m = d*n;
 #ifdef MCTRACERS
                 list->currTail = NULL;
 #endif /* MCTRACERS */
-                init_tracer_list(pG, list, m);
+                init_tracer_list(pG, list, d*n);
             }
         }
     }
@@ -385,13 +382,13 @@ double get_tracer_id() {
 /*----------------------------------------------------------------------------*/
 /* Initializes nodes of given list */
 /*----------------------------------------------------------------------------*/
-void init_tracer_list(GridS *pG, TracerListS *list, int n)
+void init_tracer_list(GridS *pG, TracerListS *list, int N)
 {
     Real x1, x2, x3;
     int i = list->i;
     int j = list->j;
     int k = list->k;
-    TracerS *tracer = NULL;
+    TracerS *tracer;
     double rand;
     
     long s = time(NULL);
@@ -404,12 +401,10 @@ void init_tracer_list(GridS *pG, TracerListS *list, int n)
 #ifdef MCTRACERS
     list->Rmass = pG->U[k][j][i].d;
 #endif /* MCTRACERS */
-    list->Tail = NULL;
-    list->Head = NULL;
     
     // Calculates cell-centered x,y,z given i,j,k
     cc_pos(pG, i, j, k, &x1, &x2, &x3);
-	for (int i = 1; i <= n; i++) {
+	for (int n = 1; n <= N; n++) {
         /* Initialize tracer, add to tail of list */
 		tracer = init_tracer();
         tracer->prop = (TracerPropS *)malloc(sizeof(TracerPropS));

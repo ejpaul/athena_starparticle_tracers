@@ -7,7 +7,7 @@
 # Makefile will be created (overwriting the last) from this template.
 #
 #-------------------  object files  --------------------------------------------
-ifeq (FFT_ENABLED,FFT_ENABLED)
+ifeq (NO_FFT,FFT_ENABLED)
 ifeq (NO_MPI_PARALLEL,MPI_PARALLEL)
 CORE_OBJ = ath_fft.o \
            factor.o \
@@ -65,7 +65,7 @@ Makedepend:
 
 # this forces a rebuild of all objects, if code re-configure'd
 
-ifeq (FFT_ENABLED,FFT_ENABLED)
+ifeq (NO_FFT,FFT_ENABLED)
 ifeq (NO_MPI_PARALLEL,MPI_PARALLEL)
 include Makedepend
 endif
