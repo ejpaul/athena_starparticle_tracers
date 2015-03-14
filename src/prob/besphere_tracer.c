@@ -54,6 +54,8 @@ void problem(DomainS *pD)
   Real y[2],eps,x0,x1,dx;
   Real dratio,xiunit,rho_crt;
   Real *r_soln=NULL,*rho_soln=NULL;
+  TracerListS *list;
+  Real rho;
 
   /* Parse input file */
   Gcons=par_getd("problem","Gcons");
@@ -63,6 +65,7 @@ void problem(DomainS *pD)
   r_out = par_getd("problem","r_out"); // edge radius (!= r_crit)
   rho_crt = par_getd("problem","rho_crt"); // density enhancement factor
   dratio=par_getd_def("problem","dratio",17.75); // ratio of central to edge density
+  rho=par_getd("problem","rho_tracer"); // proportionality of tracer density to fluid density within sphere
   
   /* Set gravity constant*/
   four_pi_G = 4.0*PI*Gcons;
@@ -126,11 +129,12 @@ void problem(DomainS *pD)
         if (r <= r_out) {
           ii = MIN((int)rint(r/dr),NSOLN-1);
           pG->U[k][j][i].d = rho_soln[ii];
-          pG->U[k][j][i].M1 = rho_soln[ii]*2;
+          list = &((pG->GridLists)[k][j][i]);
+          init_tracer_list(pG, list, rho*rho_soln[ii]);
         }
         else {
           pG->U[k][j][i].d = rho_small;
-          pG->U[k][j][i].M1 = rho_soln[ii]*2;
+          
         }
       }
     }
@@ -154,13 +158,6 @@ void problem(DomainS *pD)
 
   free_1d_array(r_soln);
   free_1d_array(rho_soln);
-  
-#if defined(MCTRACERS) || defined(VFTRACERS)
-  if (strcmp(par_gets("problem","distribution"), "uniform") == 0)
-    tracer_init_unif(pGrid);
-  else if (strcmp(par_gets("problem","distribution"), "prop") == 0)
-    tracer_init_proportional(pGrid);
-#endif // TRACERS //
 
   return;
 }

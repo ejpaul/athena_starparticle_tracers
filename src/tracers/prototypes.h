@@ -22,12 +22,11 @@ void tracer_init_proportional(GridS *pG);
 void tracer_init_xlinflow(GridS *pG);
 void tracer_debug(GridS *pG);
 double get_tracer_id();
-void init_tracer_list(TracerListS *list, int n, Real d);
+void init_tracer_list(GridS *pG, TracerListS *list, int N);
 void Tracerlist_add(TracerListS *list, TracerS *tracer);
 TracerS *init_tracer();
 void tracer_list_remove(TracerListS *list, TracerS *pnode);
 void tracer_destruct(MeshS *Mesh);
-void init_vftracer_list(GridS *pG, TracerListS *list, int N);
 
 /* integrate_tracers.c */
 void Tracerlist_sweep(TracerListS *list, GridS *pG);
@@ -52,8 +51,7 @@ void bvals_tracer(DomainS *pD);
 void bvals_tracer_init(MeshS *pM);
 
 /* vfinterp.c */
-void getwei_TSC(GridS *pG, Real x1, Real x2, Real x3, Real3Vect cell1,
-                Real weight[3][3][3], int *is, int *js, int *ks);
+void getwei_TSC(GridS *pG, Real x1, Real x2, Real x3, Real3Vect cell1, Real weight[3][3][3], int *is, int *js, int *ks);
 
 /* output_tracer_vtk.c */
 void output_tracer_vtk(MeshS *pM, OutputS *pOut);

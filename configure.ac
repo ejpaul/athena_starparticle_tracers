@@ -26,7 +26,7 @@
 #   --enable-resistivity                                  (explicit resistivity)
 #   --enable-special-relativity              (special relativistic hydro or MHD)
 #   --enable-viscosity                                      (explicit viscosity)
-#   --enable-mctracers				                       (Monte Carlo tracers)
+#   --enable-mctracers				           (Monte Carlo tracers)
 #   --enable-vftracers                                  (Velocity Field tracers)
 #
 # ALGORITHM "packages":

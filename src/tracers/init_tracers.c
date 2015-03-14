@@ -158,11 +158,8 @@ void tracer_init_unif(GridS *pG) {
                 list->Tail = NULL;
 #ifdef MCTRACERS
                 list->currTail = NULL;
-                init_tracer_list(list, n, pG->U[k][j][i].d);
-#endif
-#ifdef VFTRACERS
-                init_vftracer_list(pG, list, n);
-#endif
+#endif /* MCTRACERS */
+                init_tracer_list(pG, list, n);
             }
         }
     }
@@ -196,15 +193,10 @@ void tracer_init_threshold(GridS *pG, Real rho) {
                 list->Tail = NULL;
 #ifdef MCTRACERS
                 list->currTail = NULL;
-#endif
+#endif /* MCTRACERS */
                 d = pG->U[k][j][i].d;
                 if (d > rho) {
-#ifdef MCTRACERS
-                    init_tracer_list(list, d*n, d);
-#endif
-#ifdef VFTRACERS
-                    init_vftracer_list(pG, list, d*n);
-#endif
+                    init_tracer_list(pG, list, d*n);
                 }
             }
         }
@@ -245,17 +237,14 @@ void tracer_init_proportional(GridS *pG) {
                 m = d*n;
 #ifdef MCTRACERS
                 list->currTail = NULL;
-                init_tracer_list(list, m, d);
-#endif
-#ifdef VFTRACERS
-                init_vftracer_list(pG, list, m);
-#endif
+#endif /* MCTRACERS */
+                init_tracer_list(pG, list, m);
             }
         }
     }
 #ifdef DEBUG
     tracer_debug(pG);
-#endif
+#endif /* DEBUG */
     return;
 }
 
@@ -291,11 +280,8 @@ void tracer_init_xlinflow(GridS *pG) {
                 d = pG->U[k][j][i].d;
 #ifdef MCTRACERS
             list->currTail = NULL;
-            init_tracer_list(list, n*d, d);
-#endif
-#ifdef VFTRACERS
-            init_vftracer_list(pG, list, n*d);
-#endif
+#endif /* MCTRACERS */
+            init_tracer_list(pG, list, n*d);
         }
     }
     return;
@@ -323,7 +309,7 @@ void tracer_debug(GridS *pG) {
     if (pG->Nx[0] > 1)  cell1.x1 = 1.0/pG->dx1;  else cell1.x1 = 0.0;
     if (pG->Nx[1] > 1)  cell1.x2 = 1.0/pG->dx2;  else cell1.x2 = 0.0;
     if (pG->Nx[2] > 1)  cell1.x3 = 1.0/pG->dx3;  else cell1.x3 = 0.0;
-#endif
+#endif /* VFTRACERS */
     
     tot = 0;
     for (k=ks; k<=ke; k++) {
@@ -341,7 +327,7 @@ void tracer_debug(GridS *pG) {
                 }
 #ifdef MCTRACERS
                 assert(list->Rmass >= 0);
-#endif
+#endif /* MCTRACERS */
                 while(pnode) {
                     assert(pnode->newList==NULL);
                     if (pnode->Prev == NULL) {
@@ -399,32 +385,51 @@ double get_tracer_id() {
 /*----------------------------------------------------------------------------*/
 /* Initializes nodes of given list */
 /*----------------------------------------------------------------------------*/
-void init_tracer_list(TracerListS *list, int n, Real d)
+void init_tracer_list(GridS *pG, TracerListS *list, int n)
 {
-	TracerS *tracer = NULL;
-	int i;
-    double id;
+    Real x1, x2, x3;
+    int i = list->i;
+    int j = list->j;
+    int k = list->k;
+    TracerS *tracer = NULL;
+    double rand;
+    
+    long s = time(NULL);
+    int pid = myID_Comm_world;
+    long seed = abs(((s*181)*((pid-83)*359))%104729);
+    static gsl_rng *rng;
+    rng = gsl_rng_alloc(gsl_rng_mt19937);
+    gsl_rng_set(rng, seed);
     
 #ifdef MCTRACERS
-    /* Initialize Rmass */
-    list->Rmass = d;
-#endif
-    
+    list->Rmass = pG->U[k][j][i].d;
+#endif /* MCTRACERS */
     list->Tail = NULL;
     list->Head = NULL;
-	for (i = 1; i <= n; i++) {
+    
+    // Calculates cell-centered x,y,z given i,j,k
+    cc_pos(pG, i, j, k, &x1, &x2, &x3);
+	for (int i = 1; i <= n; i++) {
         /* Initialize tracer, add to tail of list */
-		id = get_tracer_id();
 		tracer = init_tracer();
         tracer->prop = (TracerPropS *)malloc(sizeof(TracerPropS));
-        tracer->prop->d_init = (Real)d;
-        tracer->prop->id = (Real)id;
+        tracer->prop->id = get_tracer_id();
+        tracer->prop->d_init = pG->U[k][j][i].d;
         tracer->prop->i_init = (int)list->i;
         tracer->prop->j_init = (int)list->j;
         tracer->prop->k_init = (int)list->k;
 #ifdef STAR_PARTICLE
         tracer->prop->star_id = -1;
 #endif /* STAR_PARTICLE */
+#ifdef VFTRACERS 
+        // Randomly distribute ntracers in coordinate space
+        rand = gsl_rng_uniform(rng);
+        tracer->x1 = x1 - 0.5*pG->dx1 + pG->dx1*rand;
+        rand = gsl_rng_uniform(rng);
+        tracer->x2 = x2 - 0.5*pG->dx2 + pG->dx2*rand;
+        rand = gsl_rng_uniform(rng);
+        tracer->x3 = x3 - 0.5*pG->dx3 + pG->dx3*rand;
+#endif /* VFTRACERS */
 		Tracerlist_add(list, tracer);
 	}
 	return;
@@ -594,45 +599,4 @@ void tracer_destruct(MeshS *Mesh)
     
 }
 
-#ifdef VFTRACERS
-void init_vftracer_list(GridS *pG, TracerListS *list, int N) {
-    Real x1, x2, x3;
-    int i = list->i;
-    int j = list->j;
-    int k = list->k;
-    TracerS* tracer;
-    double rand;
-    
-    long s = time(NULL);
-    int pid = myID_Comm_world;
-    long seed = abs(((s*181)*((pid-83)*359))%104729);
-    static gsl_rng *rng;
-    rng = gsl_rng_alloc(gsl_rng_mt19937);
-    gsl_rng_set(rng, seed);
-    
-    // Calculates cell-centered x,y,z given i,j,k
-    cc_pos(pG, i, j, k, &x1, &x2, &x3);
-    for (int n= 0; n < N; n++) {
-        tracer = init_tracer();
-        // Randomly distribute ntracers in coordinate space
-        rand = gsl_rng_uniform(rng);
-        tracer->x1 = x1 - 0.5*pG->dx1 + pG->dx1*rand;
-        rand = gsl_rng_uniform(rng);
-        tracer->x2 = x2 - 0.5*pG->dx2 + pG->dx2*rand;
-        rand = gsl_rng_uniform(rng);
-        tracer->x3 = x3 - 0.5*pG->dx3 + pG->dx3*rand;
-        // Initialize tracer history
-        tracer->prop->id = get_tracer_id();
-        tracer->prop->d_init = pG->U[k][j][i].d;
-        tracer->prop->i_init = i;
-        tracer->prop->j_init = j;
-        tracer->prop->k_init = k;
-#ifdef STAR_PARTICLE
-        tracer->prop->star_id = -1;
-#endif /* STAR_PARTICLE */
-        Tracerlist_add(list, tracer);
-    }
-}
-
-#endif /* VFTRACERS */
 #endif /* TRACERS */

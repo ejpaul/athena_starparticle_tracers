@@ -74,10 +74,11 @@ GRAVITY_OBJ = gravity/bvals_grav.o \
               gravity/selfg_multigrid.o
 
 TRACERS_OBJ = tracers/init_tracers.o \
-            tracers/integrate_tracers.o \
-            tracers/bvals_tracer.o \
-            tracers/vfintegrate.o \
-            tracers/vfinterp.o
+        tracers/integrate_tracers.o \
+	tracers/bvals_tracer.o \
+	tracers/vfintegrate.o \
+	tracers/vfinterp.o \
+	tracers/output_tracer_vtk.o
 
 MICROPHYS_OBJ = microphysics/conduction.o \
 		microphysics/cool.o \

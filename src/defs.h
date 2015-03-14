@@ -20,17 +20,17 @@
  *  (user modified via configure) */
 
 /* Version identifier when configure was last run */
-#define CONFIGURE_DATE "Fri Mar 13 19:48:53 EDT 2015"
+#define CONFIGURE_DATE "Fri Mar 13 21:57:32 EDT 2015"
 
 /* Problem generator with which Athena is compiled */
-#define A_PROBLEM "blast_mc"
+#define A_PROBLEM "besphere_tracer"
 
 /* HYDRO or MHD */
-#define MHD
+#define HYDRO
 
 /* ADIABATIC or ISOTHERMAL or ... */
-#define ADIABATIC
-#define EOS_STR "ADIABATIC"
+#define ISOTHERMAL
+#define EOS_STR "ISOTHERMAL"
 
 #if defined(ISOTHERMAL) /* || defined PIECEWISE_POLYTROPE ... */
 #define BAROTROPIC        /* P = P(rho) */
@@ -51,22 +51,22 @@
 #define NO_VFTRACERS
 
 /* Self-gravity */
-#define NO_SELF_GRAVITY
-#define SELF_GRAVITY_NONE
+#define SELF_GRAVITY
+#define SELF_GRAVITY_USING_FFT_OBC
 
 /* Particles */
 #define NO_PARTICLES
 #define NO_FEEDBACK
 
 /* Star-particles */
-#define NO_STAR_PARTICLE
+#define STAR_PARTICLE
 #define NO_STRICT_STARPARTICLE_CREATION
 
 /* implicit cooling */
 #define NO_COOLING
 
 /* resistivity, viscosity, and thermal conduction */
-#define RESISTIVITY
+#define NO_RESISTIVITY
 #define NO_VISCOSITY
 #define NO_THERMAL_CONDUCTION
 #define NO_STS
@@ -81,7 +81,7 @@
 /* flux type
  * ROE_FLUX, HLLE_FLUX, HLLC_FLUX, HLLD_FLUX, FORCE_FLUX, EXACT_FLUX,
  * TWO_SHOCK_FLUX */
-#define ROE_FLUX
+#define HLLC_FLUX
 
 /* unsplit integrator:
  * CTU_INTEGRATOR or VL_INTEGRATOR */
@@ -97,13 +97,13 @@
 #define NO_WRITE_GHOST_CELLS
 
 /* MPI parallelism: MPI_PARALLEL or NO_MPI_PARALLEL */
-#define MPI_PARALLEL
+#define NO_MPI_PARALLEL
 
 /* H-correction: H_CORRECTION or NO_H_CORRECTION */
 #define NO_H_CORRECTION
 
 /* FFT mode: FFT_ENABLED or NO_FFT */
-#define NO_FFT
+#define FFT_ENABLED
 
 /* shearing-box: SHEARING_BOX or NO_SHEARING_BOX */
 #define NO_SHEARING_BOX

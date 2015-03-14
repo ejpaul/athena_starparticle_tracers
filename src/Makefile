@@ -40,8 +40,8 @@ CORE_OBJ = ath_array.o \
            perturb.o
 
 FFT_OBJ =
-ifeq (NO_FFT,FFT_ENABLED)
-ifeq (MPI_PARALLEL,MPI_PARALLEL)
+ifeq (FFT_ENABLED,FFT_ENABLED)
+ifeq (NO_MPI_PARALLEL,MPI_PARALLEL)
    FFT_OBJ = fftsrc/factor.o \
              fftsrc/fft_2d.o \
              fftsrc/fft_3d.o \
@@ -74,10 +74,11 @@ GRAVITY_OBJ = gravity/bvals_grav.o \
               gravity/selfg_multigrid.o
 
 TRACERS_OBJ = tracers/init_tracers.o \
-            tracers/integrate_tracers.o \
-            tracers/bvals_tracer.o \
-            tracers/vfintegrate.o \
-            tracers/vfinterp.o
+        tracers/integrate_tracers.o \
+	tracers/bvals_tracer.o \
+	tracers/vfintegrate.o \
+	tracers/vfinterp.o \
+	tracers/output_tracer_vtk.o
 
 MICROPHYS_OBJ = microphysics/conduction.o \
 		microphysics/cool.o \

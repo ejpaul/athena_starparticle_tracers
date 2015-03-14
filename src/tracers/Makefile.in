@@ -12,6 +12,7 @@ CORE_OBJ = init_tracers.o\
         bvals_tracer.o\
         vfintegrate.o\
         vfinterp.o\
+        output_tracer_vtk.o
 
 OBJ = $(CORE_OBJ)
 

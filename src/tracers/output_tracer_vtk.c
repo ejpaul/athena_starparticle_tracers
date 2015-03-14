@@ -14,6 +14,7 @@
 #include "../athena.h"
 #include "../prototypes.h"
 #include "../globals.h"
+#include "prototypes.h"
 
 #if defined(MCTRACERS) || defined(VFTRACERS)
 #ifdef STAR_PARTICLE
@@ -42,7 +43,7 @@ void output_tracer_vtk(MeshS *pM, OutputS *pOut)
     int ie = pGrid->ie;
     int i, j, k;
     int count, m;
-    float x1, x2, x3;
+    Real x1, x2, x3;
     TracerListS *list;
     TracerS *tracer;
 

@@ -27,13 +27,13 @@ BLOCKINC =
 BLOCKLIB = 
 CUSTLIBS = -ldl -lm
 
-ifeq (NO_FFT,FFT_ENABLED)
+ifeq (FFT_ENABLED,FFT_ENABLED)
   BLOCKINC = -I fftsrc
   FFTWLIB = -lfftw3
   FFTWINC = 
 endif
 
-ifeq (MPI_PARALLEL,MPI_PARALLEL)
+ifeq (NO_MPI_PARALLEL,MPI_PARALLEL)
   CC = mpicc 
   LDR = mpicc 
 endif
@@ -68,7 +68,7 @@ else
 ifeq ($(MACHINE),antares)
   CC  = icc
   LDR = icc
-ifeq (MPI_PARALLEL,MPI_PARALLEL)
+ifeq (NO_MPI_PARALLEL,MPI_PARALLEL)
   CC  = /usr/peyton/openmpi/bin/mpicc
   LDR  = /usr/peyton/openmpi/bin/mpicc
 endif
@@ -129,11 +129,11 @@ endif
 endif
 endif
 
-ifeq (MPI_PARALLEL,NO_MPI_PARALLEL)
+ifeq (NO_MPI_PARALLEL,NO_MPI_PARALLEL)
   MPIINC = 
   MPILIB = 
 endif
-ifeq (NO_FFT,NO_FFT)
+ifeq (FFT_ENABLED,NO_FFT)
   FFTWINC = 
   FFTWLIB = 
 endif

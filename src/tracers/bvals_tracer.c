@@ -1288,7 +1288,7 @@ static void pack_ix1_tracers(GridS *pG)
                 send_buf_mc0x1[l].j_init = (int)tracer->prop->j_init;
                 send_buf_mc0x1[l].k_init = (int)tracer->prop->k_init;
 #ifdef STAR_PARTICLE
-                send_buf_mc0x1[l].id_star = (int)tracer->prop->id_star;
+                send_buf_mc0x1[l].star_id = (int)tracer->prop->star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 send_buf_mc0x1[l].x1 = (double)tracer->x1;
@@ -1357,7 +1357,7 @@ static void pack_ox1_tracers(GridS *pG)
                 send_buf_mc1x1[l].j_init = (int)tracer->prop->j_init;
                 send_buf_mc1x1[l].k_init = (int)tracer->prop->k_init;
 #ifdef STAR_PARTICLE
-                send_buf_mc1x1[l].id_star = (int)tracer->prop->id_star;
+                send_buf_mc1x1[l].star_id = (int)tracer->prop->star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 send_buf_mc1x1[l].x1 = (double)tracer->x1;
@@ -1427,7 +1427,7 @@ static void pack_ix2_tracers(GridS *pG)
                 send_buf_mc0x2[l].j_init = (int)tracer->prop->j_init;
                 send_buf_mc0x2[l].k_init = (int)tracer->prop->k_init;
 #ifdef STAR_PARTICLE
-                send_buf_mc0x2[l].id_star = (int)tracer->prop->id_star;
+                send_buf_mc0x2[l].star_id = (int)tracer->prop->star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 send_buf_mc0x2[l].x1 = (double)tracer->x1;
@@ -1494,7 +1494,7 @@ static void pack_ox2_tracers(GridS *pG)
                 send_buf_mc1x2[l].j_init = (int)tracer->prop->j_init;
                 send_buf_mc1x2[l].k_init = (int)tracer->prop->k_init;
 #ifdef STAR_PARTICLE
-                send_buf_mc1x2[l].id_star = (int)tracer->prop->id_star;
+                send_buf_mc1x2[l].star_id = (int)tracer->prop->star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 send_buf_mc1x2[l].x1 = (double)tracer->x1;
@@ -1561,7 +1561,7 @@ static void pack_ix3_tracers(GridS *pG)
                 send_buf_mc0x3[l].j_init = (int)tracer->prop->j_init;
                 send_buf_mc0x3[l].k_init = (int)tracer->prop->k_init;
 #ifdef STAR_PARTICLE
-                send_buf_mc0x3[l].id_star = (int)tracer->prop->id_star;
+                send_buf_mc0x3[l].star_id = (int)tracer->prop->star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 send_buf_mc0x3[l].x1 = (double)tracer->x1;
@@ -1611,7 +1611,7 @@ static void pack_ox3_tracers(GridS *pG)
                 send_buf_mc1x3[l].j_init = (int)tracer->prop->j_init;
                 send_buf_mc1x3[l].k_init = (int)tracer->prop->k_init;
 #ifdef STAR_PARTICLE
-                send_buf_mc1x3[l].id_star = (int)tracer->prop->id_star;
+                send_buf_mc1x3[l].star_id = (int)tracer->prop->star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 send_buf_mc1x3[l].x1 = (double)tracer->x1;
@@ -1888,7 +1888,7 @@ static void unpack_ix1_mc(GridS *pG)
                 prop->j_init = (int)recv_buf_mc0x1[m].j_init;
                 prop->k_init = (int)recv_buf_mc0x1[m].k_init;
 #ifdef STAR_PARTICLE
-                prop->id_star = (int)recv_buf_mc0x1[m].id_star;
+                prop->star_id = (int)recv_buf_mc0x1[m].star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 tracer->x1 = (double)recv_buf_mc0x1[m].x1;
@@ -1935,7 +1935,7 @@ static void unpack_ox1_mc(GridS *pG)
                 prop->j_init = (int)recv_buf_mc1x1[m].j_init;
                 prop->k_init = (int)recv_buf_mc1x1[m].k_init;
 #ifdef STAR_PARTICLE
-                prop->id_star = (int)recv_buf_mc1x1[m].id_star;
+                prop->star_id = (int)recv_buf_mc1x1[m].star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 tracer->x1 = (double)recv_buf_mc1x1[m].x1;
@@ -1980,7 +1980,7 @@ static void unpack_ix2_mc(GridS *pG)
                 prop->j_init = (int)recv_buf_mc0x2[m].j_init;
                 prop->k_init = (int)recv_buf_mc0x2[m].k_init;
 #ifdef STAR_PARTICLE
-                prop->id_star = (int)recv_buf_mc0x2[m].id_star;
+                prop->star_id = (int)recv_buf_mc0x2[m].star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 tracer->x1 = (double)recv_buf_mc0x2[m].x1;
@@ -2025,7 +2025,7 @@ static void unpack_ox2_mc(GridS *pG)
                 prop->j_init = (int)recv_buf_mc1x2[m].j_init;
                 prop->k_init = (int)recv_buf_mc1x2[m].k_init;
 #ifdef STAR_PARTICLE
-                prop->id_star = (int)recv_buf_mc1x2[m].id_star;
+                prop->star_id = (int)recv_buf_mc1x2[m].star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 tracer->x1 = (double)recv_buf_mc1x2[m].x1;
@@ -2070,7 +2070,7 @@ static void unpack_ix3_mc(GridS *pG)
                 prop->j_init = (int)recv_buf_mc0x3[m].j_init;
                 prop->k_init = (int)recv_buf_mc0x3[m].k_init;
 #ifdef STAR_PARTICLE
-                prop->id_star = (int)recv_buf_mc0x3[m].id_star;
+                prop->star_id = (int)recv_buf_mc0x3[m].star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 tracer->x1 = (double)recv_buf_mc0x3[m].x1;
@@ -2115,7 +2115,7 @@ static void unpack_ox3_mc(GridS *pG)
                 prop->j_init = (int)recv_buf_mc1x3[m].j_init;
                 prop->k_init = (int)recv_buf_mc1x3[m].k_init;
 #ifdef STAR_PARTICLE
-                prop->id_star = (int)recv_buf_mc1x3[m].id_star;
+                prop->star_id = (int)recv_buf_mc1x3[m].star_id;
 #endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
                 tracer->x1 = (double)recv_buf_mc1x3[m].x1;

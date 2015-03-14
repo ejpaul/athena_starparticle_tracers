@@ -45,7 +45,7 @@ struct TracerPropS{
     double d_init; /*!< initial density of underlying fluid */
     int i_init,j_init,k_init; /*!< initial coordinates of tracer */
 #ifdef STAR_PARTICLE
-    int star_id /*!< id of associated star particle */
+    int star_id; /*!< id of associated star particle */
 #endif /* STAR_PARTICLE */
 };
 

@@ -1,36 +1,36 @@
 bvals_grav.o: bvals_grav.c ../copyright.h ../defs.h ../athena.h \
   ../tracers/tracers.h ../tracers/../config.h prototypes.h \
-  ../prototypes.h ../integrators/prototypes.h \
+  ../prototypes.h ../fftsrc/prototypes.h ../integrators/prototypes.h \
   ../microphysics/prototypes.h ../particles/prototypes.h \
   ../reconstruction/prototypes.h ../rsolvers/prototypes.h \
   ../star_particles/prototypes.h ../tracers/prototypes.h ../globals.h
 selfg.o: selfg.c ../copyright.h ../defs.h ../athena.h \
   ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
-  ../prototypes.h ../integrators/prototypes.h \
+  ../prototypes.h ../fftsrc/prototypes.h ../integrators/prototypes.h \
   ../microphysics/prototypes.h ../particles/prototypes.h \
   ../reconstruction/prototypes.h ../rsolvers/prototypes.h \
   ../star_particles/prototypes.h ../tracers/prototypes.h
 selfg_fft.o: selfg_fft.c ../copyright.h ../defs.h ../athena.h \
   ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
-  ../prototypes.h ../integrators/prototypes.h \
+  ../prototypes.h ../fftsrc/prototypes.h ../integrators/prototypes.h \
   ../microphysics/prototypes.h ../particles/prototypes.h \
   ../reconstruction/prototypes.h ../rsolvers/prototypes.h \
   ../star_particles/prototypes.h ../tracers/prototypes.h
 selfg_fft_disk.o: selfg_fft_disk.c ../copyright.h ../defs.h ../athena.h \
   ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
-  ../prototypes.h ../integrators/prototypes.h \
+  ../prototypes.h ../fftsrc/prototypes.h ../integrators/prototypes.h \
   ../microphysics/prototypes.h ../particles/prototypes.h \
   ../reconstruction/prototypes.h ../rsolvers/prototypes.h \
   ../star_particles/prototypes.h ../tracers/prototypes.h
 selfg_fft_obc.o: selfg_fft_obc.c ../copyright.h ../defs.h ../athena.h \
   ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
-  ../prototypes.h ../integrators/prototypes.h \
+  ../prototypes.h ../fftsrc/prototypes.h ../integrators/prototypes.h \
   ../microphysics/prototypes.h ../particles/prototypes.h \
   ../reconstruction/prototypes.h ../rsolvers/prototypes.h \
   ../star_particles/prototypes.h ../tracers/prototypes.h
 selfg_multigrid.o: selfg_multigrid.c ../copyright.h ../defs.h ../athena.h \
   ../tracers/tracers.h ../tracers/../config.h ../globals.h prototypes.h \
-  ../prototypes.h ../integrators/prototypes.h \
+  ../prototypes.h ../fftsrc/prototypes.h ../integrators/prototypes.h \
   ../microphysics/prototypes.h ../particles/prototypes.h \
   ../reconstruction/prototypes.h ../rsolvers/prototypes.h \
   ../star_particles/prototypes.h ../tracers/prototypes.h
