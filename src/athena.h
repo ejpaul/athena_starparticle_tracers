@@ -491,7 +491,7 @@ typedef struct Domain_s{
 #ifdef MPI_PARALLEL
   MPI_Comm Comm_Domain;      /*!< MPI communicator between Grids on this Dom */
   MPI_Group Group_Domain;    /*!< MPI group for Domain communicator */
-#if defined(MCTRACERS) || defined(VLTRACERS)
+#if defined(MCTRACERS) || defined(VFTRACERS)
   MPI_Datatype TRACERTYPE;
   MPI_Datatype LISTTYPE;
 #endif

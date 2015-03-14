@@ -115,13 +115,19 @@ int main(int argc, char *argv[])
   clock_t time0,time1, have_times;
   struct timeval tvs, tve;
   Real dt_done;
+    
 
 #ifdef MPI_PARALLEL
   char *pc, *suffix, new_name[MAXLEN];
   int len, h, m, s, err, use_wtlim=0;
   double wtend;
+    int DebugWait = 1;
+  int myid;
   if(MPI_SUCCESS != MPI_Init(&argc, &argv))
     ath_error("[main]: Error on calling MPI_Init\n");
+  MPI_Comm_rank(MPI_COMM_WORLD, &myid);
+    printf("PID = %d\n", myid);
+//    while(DebugWait);
 #endif /* MPI_PARALLEL */
 /*----------------------------------------------------------------------------*/
 /* Steps in main:

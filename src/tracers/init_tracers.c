@@ -416,12 +416,15 @@ void init_tracer_list(TracerListS *list, int n, Real d)
         /* Initialize tracer, add to tail of list */
 		id = get_tracer_id();
 		tracer = init_tracer();
-        tracer->hist = (TracerHistS *)malloc(sizeof(TracerHistS));
-        tracer->hist->d_init = (Real)d;
-        tracer->hist->id = (Real)id;
-        tracer->hist->i_init = (int)list->i;
-        tracer->hist->j_init = (int)list->j;
-        tracer->hist->k_init = (int)list->k;
+        tracer->prop = (TracerPropS *)malloc(sizeof(TracerPropS));
+        tracer->prop->d_init = (Real)d;
+        tracer->prop->id = (Real)id;
+        tracer->prop->i_init = (int)list->i;
+        tracer->prop->j_init = (int)list->j;
+        tracer->prop->k_init = (int)list->k;
+#ifdef STAR_PARTICLE
+        tracer->prop->star_id = -1;
+#endif /* STAR_PARTICLE */
 		Tracerlist_add(list, tracer);
 	}
 	return;
@@ -467,7 +470,7 @@ TracerS *init_tracer()
 	if (tracer == NULL) goto on_error;
 	tracer->Prev = NULL;
     tracer->Next = NULL;
-    tracer->hist = (TracerHistS*) malloc(sizeof(TracerHistS));
+    tracer->prop = (TracerPropS*) malloc(sizeof(TracerPropS));
 	tracer->newList = NULL;
 	return tracer;
     
@@ -619,11 +622,14 @@ void init_vftracer_list(GridS *pG, TracerListS *list, int N) {
         rand = gsl_rng_uniform(rng);
         tracer->x3 = x3 - 0.5*pG->dx3 + pG->dx3*rand;
         // Initialize tracer history
-        tracer->hist->id = get_tracer_id();
-        tracer->hist->d_init = pG->U[k][j][i].d;
-        tracer->hist->i_init = i;
-        tracer->hist->j_init = j;
-        tracer->hist->k_init = k;
+        tracer->prop->id = get_tracer_id();
+        tracer->prop->d_init = pG->U[k][j][i].d;
+        tracer->prop->i_init = i;
+        tracer->prop->j_init = j;
+        tracer->prop->k_init = k;
+#ifdef STAR_PARTICLE
+        tracer->prop->star_id = -1;
+#endif /* STAR_PARTICLE */
         Tracerlist_add(list, tracer);
     }
 }

@@ -97,16 +97,6 @@ void init_mesh(MeshS *pM)
 #ifdef MPI_PARALLEL
   int ierr,child_found,groupn,Nranks,Nranks0,max_rank,irank,*ranks;
   MPI_Group world_group;
-    
-#if defined(MCTRACERS) || defined(VFTRACERS}
-    MPI_Datatype oldtypes[1];
-    int          blockcounts[1];
-    MPI_Aint     offsets[1], extent, lb;
-    
-    MPI_Datatype oldtypes2[1];
-    int          blockcounts2[1];
-    MPI_Aint     offsets2[1], extent2, lb2;
-#endif /* TRACERS */
 
 /* Get total # of processes, in MPI_COMM_WORLD */
   ierr = MPI_Comm_size(MPI_COMM_WORLD, &Nproc_Comm_world);
@@ -782,6 +772,87 @@ void init_mesh(MeshS *pM)
   if (ierr != MPI_SUCCESS)
     ath_error("[init_mesh]: Error calling MPI_Type_commit!\n");
 #endif /* STAR_PARTICLE */
+    
+#if defined(MCTRACERS) || defined(VFTRACERS)
+    
+    MPI_Datatype types[9];
+    MPI_Aint displacements[9];
+    int blocklength[9];
+    Tracer_MPI tracer;
+    
+    types[0] = MPI_DOUBLE;
+    types[1] = MPI_DOUBLE;
+    types[2] = MPI_INT;
+    types[3] = MPI_INT;
+    types[4] = MPI_INT;
+    types[5] = MPI_INT;
+    types[6] = MPI_DOUBLE;
+    types[7] = MPI_DOUBLE;
+    types[8] = MPI_DOUBLE;
+    
+    blocklength[0] = 1;
+    blocklength[1] = 1;
+    blocklength[2] = 1;
+    blocklength[3] = 1;
+    blocklength[4] = 1;
+    blocklength[5] = 1;
+    blocklength[6] = 1;
+    blocklength[7] = 1;
+    blocklength[8] = 1;
+    
+    displacements[0] = (MPI_Aint)&tracer.id - (MPI_Aint)&tracer;
+    displacements[1] = (MPI_Aint)&tracer.d_init - (MPI_Aint)&tracer;
+    displacements[2] = (MPI_Aint)&tracer.i_init - (MPI_Aint)&tracer;
+    displacements[3] = (MPI_Aint)&tracer.j_init - (MPI_Aint)&tracer;
+    displacements[4] = (MPI_Aint)&tracer.k_init - (MPI_Aint)&tracer;
+    displacements[5] = (MPI_Aint)&tracer.star_id - (MPI_Aint)&tracer;
+    displacements[6] = (MPI_Aint)&tracer.x1 - (MPI_Aint)&tracer;
+    displacements[7] = (MPI_Aint)&tracer.x2 - (MPI_Aint)&tracer;
+    displacements[8] = (MPI_Aint)&tracer.x3 - (MPI_Aint)&tracer;
+    
+    ierr = MPI_Type_create_struct(9, blocklength, displacements, types,
+                                  &(pD->TRACERTYPE));
+    if (ierr != MPI_SUCCESS)
+        ath_error("[init_mesh]: Error calling MPI_Type_create_struct!\n");
+    
+    /* Commit the MPI tracer structure type */
+    ierr = MPI_Type_commit(&(pD->TRACERTYPE));
+    if (ierr != MPI_SUCCESS)
+        ath_error("[init_mesh]: Error calling MPI_Type_commit!\n");
+    
+    MPI_Datatype types_list[1];
+    MPI_Aint displacements_list[1];
+    int blocklength_list[1];
+    
+    TracerList_MPI list;
+    types_list[0] = MPI_INT;
+    blocklength_list[0] = 1;
+    displacements_list[0] = (MPI_Aint)&list.count - (MPI_Aint)&list;
+    
+    ierr = MPI_Type_create_struct(1, blocklength_list, displacements_list, types_list,
+                                  &(pD->LISTTYPE));
+    if (ierr != MPI_SUCCESS)
+        ath_error("[init_mesh]: Error calling MPI_Type_create_struct!\n");
+    
+    /* Commit the MPI tracer structure type */
+    ierr = MPI_Type_commit(&(pD->LISTTYPE));
+    if (ierr != MPI_SUCCESS)
+        ath_error("[init_mesh]: Error calling MPI_Type_commit!\n");
+    
+    int size;
+    MPI_Type_size(pD->LISTTYPE, &size);
+    printf("size of pD->LISTTYPE = %d\n", size);
+    size = sizeof(TracerList_MPI);
+    printf("size of TracerList_MPI = %d\n", size);
+    
+    MPI_Type_size(pD->TRACERTYPE, &size);
+    printf("size of pD->TRACERTYPE = %d\n", size);
+    size = sizeof(Tracer_MPI);
+    printf("size of Tracer_MPI = %d\n", size);
+    fflush(0);
+    
+    
+#endif /* TRACERS */
  
 #endif /* MPI_PARALLEL */
 
@@ -905,27 +976,24 @@ void init_mesh(MeshS *pM)
     
     /*--- Step 10: Create MPI LIST and INIT Structures ----------*/
     
-#ifdef MPI_PARALLEL
-#if defined(MCTRACERS) || defined(VFTRACERS)
+
     /* Initialize count */
-    offsets[0] = 0;
-    oldtypes[0] = MPI_INT;
-    blockcounts[0] = 1;
-    
-    MPI_Type_create_struct(1, blockcounts, offsets, oldtypes, &(pD->LISTTYPE));
-    ierr = MPI_Type_commit(&(pD->LISTTYPE));
-    if (ierr != MPI_SUCCESS) ath_error("[init_mesh]: Error calling MPI_Type_commit!\n");
-    
-    /* Initialize id, d_init */
-    offsets2[0] = 0;
-    oldtypes2[0] = MPI_DOUBLE;
-    blockcounts2[0] = 5;
-    
-    MPI_Type_create_struct(1, blockcounts2, offsets2, oldtypes2, &(pD->TRACERTYPE));
-    ierr = MPI_Type_commit(&(pD->TRACERTYPE));
-    if (ierr != MPI_SUCCESS) ath_error("[init_mesh]: Error calling MPI_Type_commit!\n");
-#endif /* MPI_PARALLEL */
-#endif /* TRACERS */
+//    offsets[0] = 0;
+//    oldtypes[0] = MPI_INT;
+//    blockcounts[0] = 1;
+//    
+//    MPI_Type_create_struct(1, blockcounts, offsets, oldtypes, &(pD->LISTTYPE));
+//    ierr = MPI_Type_commit(&(pD->LISTTYPE));
+//    if (ierr != MPI_SUCCESS) ath_error("[init_mesh]: Error calling MPI_Type_commit!\n");
+//    
+//    /* Initialize id, d_init */
+//    offsets2[0] = 0;
+//    oldtypes2[0] = MPI_DOUBLE;
+//    blockcounts2[0] = 5;
+//    
+//    MPI_Type_create_struct(1, blockcounts2, offsets2, oldtypes2, &(pD->TRACERTYPE));
+//    ierr = MPI_Type_commit(&(pD->TRACERTYPE));
+//    if (ierr != MPI_SUCCESS) ath_error("[init_mesh]: Error calling MPI_Type_commit!\n");
 
   free(next_domainid);
   return;

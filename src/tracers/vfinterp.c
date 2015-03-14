@@ -148,7 +148,6 @@ void getwei_TSC(GridS *pG, Real x1, Real x2, Real x3, Real3Vect cell1,
         for (j=0; j<3; j++) {
             for (i=0; i<3; i++) {
                 weight[k][j][i] = wei1[i] * wei2[j] * wei3[k];
-//                printf("weight[%d][%d][%d] = %f\n", k,j,i,weight[k][j][i]);
             }
         }
     }

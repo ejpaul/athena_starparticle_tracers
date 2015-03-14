@@ -37,6 +37,7 @@ void prob_iterate_x2(TracerListS *list, double pflux, GridS *pG);
 void prob_iterate_x3(TracerListS *list, double pflux, GridS *pG);
 void ran_gen_list(GridS *pG);
 void ran_gen(GridS *pG);
+void flag_tracer_star(GridS *pG, int ic, int jc, int kc, int star_id);
 
 /* vfintegrate.c */
 void vf_newijk(DomainS* pD);
@@ -53,6 +54,9 @@ void bvals_tracer_init(MeshS *pM);
 /* vfinterp.c */
 void getwei_TSC(GridS *pG, Real x1, Real x2, Real x3, Real3Vect cell1,
                 Real weight[3][3][3], int *is, int *js, int *ks);
+
+/* output_tracer_vtk.c */
+void output_tracer_vtk(MeshS *pM, OutputS *pOut);
 
 #endif /* TRACERS */
 

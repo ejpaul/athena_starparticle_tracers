@@ -310,6 +310,14 @@ Now use the default one.\n");
         goto add_it;
       }
 #endif
+#if defined(VFTRACERS) || defined(MCTRACERS)
+#ifdef STAR_PARTICLE
+      else if (strcmp(fmt,"tracer_vtk")==0) {
+          new_out.out_fun = output_tracer_vtk;
+          goto add_it;
+      }
+#endif /* STAR_PARTICLE */
+#endif /* TRACERS */
       else{    /* Unknown data dump (fatal error) */
 	ath_error("Unsupported dump mode for %s/out_fmt=%s for out=cons\n",
           block,fmt);
@@ -460,6 +468,12 @@ Now use the default one.\n");
     else if (strcmp(fmt,"starpar_vtk")==0)
       new_out.out_fun = output_starpar_vtk;
 #endif
+#if defined(VFTRACERS) || defined(MCTRACERS)
+#ifdef STAR_PARTICLE
+    else if (strcmp(fmt,"tracer_vtk")==0)
+        new_out.out_fun = output_tracer_vtk;
+#endif /* STAR_PARTICLE */
+#endif /* TRACERS */
     else if (strcmp(fmt,"tab")==0)
       new_out.out_fun = output_tab;
     else {

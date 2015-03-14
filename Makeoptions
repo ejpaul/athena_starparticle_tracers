@@ -17,7 +17,7 @@ MACHINE = default
 
 CC  = gcc
 LDR = gcc
-OPT = -g -Wall -W -std=c99 -pedantic
+OPT = -O3
 CUSTLIBS =
 MPIINC =
 MPILIB =
@@ -33,16 +33,16 @@ ifeq (NO_FFT,FFT_ENABLED)
   FFTWINC = 
 endif
 
-ifeq (NO_MPI_PARALLEL,MPI_PARALLEL)
+ifeq (MPI_PARALLEL,MPI_PARALLEL)
   CC = mpicc 
   LDR = mpicc 
 endif
 
-ifeq (NO_MCTRACERS, MCTRACERS)
+ifeq (MCTRACERS, MCTRACERS)
     TRACERLIB = -L/usr/local/lib -lgsl -lgslcblas
     TRACERINC = -I/usr/local/include
 else
-ifeq (VFTRACERS, VFTRACERS)
+ifeq (NO_VFTRACERS, VFTRACERS)
     TRACERLIB = -L/usr/local/lib -lgsl -lgslcblas
     TRACERINC = -I/usr/local/include
 endif
@@ -68,7 +68,7 @@ else
 ifeq ($(MACHINE),antares)
   CC  = icc
   LDR = icc
-ifeq (NO_MPI_PARALLEL,MPI_PARALLEL)
+ifeq (MPI_PARALLEL,MPI_PARALLEL)
   CC  = /usr/peyton/openmpi/bin/mpicc
   LDR  = /usr/peyton/openmpi/bin/mpicc
 endif
@@ -129,7 +129,7 @@ endif
 endif
 endif
 
-ifeq (NO_MPI_PARALLEL,NO_MPI_PARALLEL)
+ifeq (MPI_PARALLEL,NO_MPI_PARALLEL)
   MPIINC = 
   MPILIB = 
 endif

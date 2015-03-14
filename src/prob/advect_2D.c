@@ -20,8 +20,8 @@ void problem(DomainS *pDomain)
             for (i=is; i<=ie; i++) {
                 if (((i-50)*(i-50) + (j-50)*(j-50)) <= 100) {
                     pGrid->U[k][j][i].d  = 2;
-                    pGrid->U[k][j][i].M1 = 2;
-                    pGrid->U[k][j][i].M2 = 0;
+                    pGrid->U[k][j][i].M1 = 0;
+                    pGrid->U[k][j][i].M2 = 2;
                     pGrid->U[k][j][i].M3 = 0;
                     pGrid->U[k][j][i].E = 1.0;
                     pGrid->U[k][j][i].B1c = 0;
@@ -30,8 +30,8 @@ void problem(DomainS *pDomain)
                 }
                 else {
                     pGrid->U[k][j][i].d  = 1;
-                    pGrid->U[k][j][i].M1 = 1;
-                    pGrid->U[k][j][i].M2 = 0;
+                    pGrid->U[k][j][i].M1 = 0;
+                    pGrid->U[k][j][i].M2 = 1;
                     pGrid->U[k][j][i].M3 = 0;
                     pGrid->U[k][j][i].E = 0.5;
                     pGrid->U[k][j][i].B1c = 0;
@@ -99,7 +99,7 @@ static Real d_init(const GridS *pG, const int i, const int j, const int k)
     TracerS *tracer = pG->GridLists[k][j][i].Head;
     while (tracer) {
         n++;
-        d += tracer->hist->d_init;
+        d += tracer->prop->d_init;
         tracer = tracer->Next;
     }
     if (n != 0){
@@ -117,7 +117,7 @@ static Real i_init(const GridS *pG, const int i, const int j, const int k)
     TracerS *tracer = pG->GridLists[k][j][i].Head;
     while (tracer) {
         n++;
-        d += tracer->hist->d_init;
+        d += tracer->prop->d_init;
         tracer = tracer->Next;
     }
     if (n != 0){

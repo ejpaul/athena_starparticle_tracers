@@ -1227,6 +1227,7 @@ void integrate_2d_vl(DomainS *pD)
         
 #ifdef MCTRACERS
         list = &((pG->GridLists)[ks][j][i]);
+        
         if (list->Rmass > 0) {
             /* If outgoing (right face) flux, MC iterate through tracers */
             if (dtodx2*rsf*x2Flux[j+1][i].d > 0) {
@@ -1245,7 +1246,8 @@ void integrate_2d_vl(DomainS *pD)
                 list->Rmass += (dtodx2*lsf*x2Flux[j][i].d);
             }
         }
-#endif
+        
+#endif /* MCTRACERS */
         
     }
   }

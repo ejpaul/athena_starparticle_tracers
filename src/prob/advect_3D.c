@@ -94,7 +94,7 @@ static Real d_init(const GridS *pG, const int i, const int j, const int k)
     MCtracerS *tracer = pG->GridLists[k][j][i].Head;
     while (tracer) {
         n++;
-        d += tracer->hist->d_init;
+        d += tracer->prop->d_init;
         tracer = tracer->Next;
     }
     return d/n;

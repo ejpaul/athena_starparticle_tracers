@@ -20,7 +20,7 @@
  *  (user modified via configure) */
 
 /* Version identifier when configure was last run */
-#define CONFIGURE_DATE "Tue Mar 10 22:51:20 EDT 2015"
+#define CONFIGURE_DATE "Fri Mar 13 19:48:53 EDT 2015"
 
 /* Problem generator with which Athena is compiled */
 #define A_PROBLEM "blast_mc"
@@ -45,10 +45,10 @@
 #define NSCALARS 0
 
 /* Monte Carlo Tracers */
-#define NO_MCTRACERS
+#define MCTRACERS
 
 /* Velocity Field Tracers */
-#define VFTRACERS
+#define NO_VFTRACERS
 
 /* Self-gravity */
 #define NO_SELF_GRAVITY
@@ -66,7 +66,7 @@
 #define NO_COOLING
 
 /* resistivity, viscosity, and thermal conduction */
-#define NO_RESISTIVITY
+#define RESISTIVITY
 #define NO_VISCOSITY
 #define NO_THERMAL_CONDUCTION
 #define NO_STS
@@ -91,13 +91,13 @@
 #define DOUBLE_PREC
 
 /* debug mode: DEBUG or OPTIMIZE */
-#define DEBUG
+#define OPTIMIZE
 
 /* Write ghost cells in outputs: WRITE_GHOST_CELLS or NO_WRITE_GHOST_CELLS */
 #define NO_WRITE_GHOST_CELLS
 
 /* MPI parallelism: MPI_PARALLEL or NO_MPI_PARALLEL */
-#define NO_MPI_PARALLEL
+#define MPI_PARALLEL
 
 /* H-correction: H_CORRECTION or NO_H_CORRECTION */
 #define NO_H_CORRECTION

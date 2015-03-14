@@ -16,6 +16,7 @@
 #include "athena.h"
 #include "globals.h"
 #include "prototypes.h"
+#include <string.h>
 
 /*----------------------------------------------------------------------------*/
 /* problem:  */
@@ -95,9 +96,7 @@ void problem(DomainS *pDomain)
   Q_Hall  = 0.0;
   d_ind   = 0.0;
 #endif
-    
-    mc_init_unif(pGrid);
-    
+        
 #if defined(MCTRACERS) || defined(VFTRACERS)
     if (strcmp(par_gets("problem","distribution"), "uniform") == 0)
         tracer_init_unif(pGrid);
@@ -155,7 +154,7 @@ static Real d_init(const GridS *pG, const int i, const int j, const int k)
     TracerS *tracer = pG->GridLists[k][j][i].Head;
     while (tracer) {
         n++;
-        d += tracer->hist->d_init;
+        d += tracer->prop->d_init;
         tracer = tracer->Next;
     }
     if (n != 0){
@@ -173,7 +172,7 @@ static Real i_init(const GridS *pG, const int i, const int j, const int k)
     TracerS *tracer = pG->GridLists[k][j][i].Head;
     while (tracer) {
         n++;
-        d += tracer->hist->d_init;
+        d += tracer->prop->i_init;
         tracer = tracer->Next;
     }
     if (n != 0){
@@ -198,7 +197,8 @@ ConsFun_t get_usr_expr(const char *expr)
 #if defined(MCTRACERS) || defined(VFTRACERS)
     if(strcmp(expr, "num_density")==0) return num_density;
     if(strcmp(expr, "d_init")==0) return d_init;
-    if(strcmp(expr, "ratio_map")==0) return d_init;
+    if(strcmp(expr, "i_init")==0) return i_init;
+    if(strcmp(expr, "ratio_map")==0) return ratio_map;
 #endif /* TRACERS */
     return NULL;
 }

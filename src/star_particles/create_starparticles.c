@@ -117,6 +117,9 @@ void create_starparticles(DomainS *pD)
                   }
                   if (new_star_particle_flag)
                     push_to_local_list(pG,i,j,k,starpar_id);
+#if defined(MCTRACERS) || defined(VFTRACERS)
+                    flag_tracer_star(pG, i, j, k, starpar_id);
+#endif /* TRACERS */
                 }
 #ifdef STRICT_STARPARTICLE_CREATION
 #ifdef SELF_GRAVITY

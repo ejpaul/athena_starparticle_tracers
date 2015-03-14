@@ -27,19 +27,19 @@ static VGFun_t apply_mc_ix3 = NULL, apply_mc_ox3 = NULL;
 #ifdef MPI_PARALLEL
 /* MPI send and receive buffers */
 static int *send_buf = NULL, *recv_buf = NULL;
-static MCtracer_MPI *send_buf_mc0x1 = NULL, *send_buf_mc1x1 = NULL;
-static MCtracer_MPI *recv_buf_mc0x1 = NULL, *recv_buf_mc1x1 = NULL;
-static MCtracer_MPI *send_buf_mc0x2 = NULL, *send_buf_mc1x2 = NULL;
-static MCtracer_MPI *recv_buf_mc0x2 = NULL, *recv_buf_mc1x2 = NULL;
-static MCtracer_MPI *send_buf_mc0x3 = NULL, *send_buf_mc1x3 = NULL;
-static MCtracer_MPI *recv_buf_mc0x3 = NULL, *recv_buf_mc1x3 = NULL;
+static Tracer_MPI *send_buf_mc0x1 = NULL, *send_buf_mc1x1 = NULL;
+static Tracer_MPI *recv_buf_mc0x1 = NULL, *recv_buf_mc1x1 = NULL;
+static Tracer_MPI *send_buf_mc0x2 = NULL, *send_buf_mc1x2 = NULL;
+static Tracer_MPI *recv_buf_mc0x2 = NULL, *recv_buf_mc1x2 = NULL;
+static Tracer_MPI *send_buf_mc0x3 = NULL, *send_buf_mc1x3 = NULL;
+static Tracer_MPI *recv_buf_mc0x3 = NULL, *recv_buf_mc1x3 = NULL;
 
-static MClist_MPI *send_buf_list0x1 = NULL, *send_buf_list1x1 = NULL;
-static MClist_MPI *recv_buf_list0x1 = NULL, *recv_buf_list1x1 = NULL;
-static MClist_MPI *send_buf_list0x2 = NULL, *send_buf_list1x2 = NULL;
-static MClist_MPI *recv_buf_list0x2 = NULL, *recv_buf_list1x2 = NULL;
-static MClist_MPI *send_buf_list0x3 = NULL, *send_buf_list1x3 = NULL;
-static MClist_MPI *recv_buf_list0x3 = NULL, *recv_buf_list1x3 = NULL;
+static TracerList_MPI *send_buf_list0x1 = NULL, *send_buf_list1x1 = NULL;
+static TracerList_MPI *recv_buf_list0x1 = NULL, *recv_buf_list1x1 = NULL;
+static TracerList_MPI *send_buf_list0x2 = NULL, *send_buf_list1x2 = NULL;
+static TracerList_MPI *recv_buf_list0x2 = NULL, *recv_buf_list1x2 = NULL;
+static TracerList_MPI *send_buf_list0x3 = NULL, *send_buf_list1x3 = NULL;
+static TracerList_MPI *recv_buf_list0x3 = NULL, *recv_buf_list1x3 = NULL;
 
 static MPI_Request *recv_rq = NULL, *send_rq = NULL;
 #endif /* MPI_PARALLEL */
@@ -104,10 +104,7 @@ void bvals_tracer(DomainS *pD) {
     GridS *pGrid = (pD->Grid);
 #ifdef MPI_PARALLEL
     int err, mIndex;
-    int cnt, cnt_send, cnt_send1, cnt_recv, cnt_recv1;
-    int myL, myM, myN;
-    MPI_Request rq;
-    MPI_Status stat;
+    int cnt;
     
     if((recv_buf = (int*)calloc_1d_array(2,sizeof(int))) == NULL)
         ath_error("[bvals_init]: Failed to allocate recv buffer\n");
@@ -127,13 +124,13 @@ void bvals_tracer(DomainS *pD) {
 #ifdef MPI_PARALLEL
         cnt = nghost*(pGrid->Nx[1])*(pGrid->Nx[2]); // Number of cells
         
-        if((send_buf_list0x1 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((send_buf_list0x1 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
-        if((send_buf_list1x1 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((send_buf_list1x1 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
-        if((recv_buf_list0x1 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((recv_buf_list0x1 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
-        if((recv_buf_list1x1 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI
+        if((recv_buf_list1x1 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI
                                                                        ))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
         
@@ -148,7 +145,7 @@ void bvals_tracer(DomainS *pD) {
             send_buf[0] = pack_ix1_mc(pGrid);
 
             /* calloc tracer buffer for send to l */
-            if((send_buf_mc0x1 = (MCtracer_MPI *)calloc_1d_array(send_buf[0], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc0x1 = (Tracer_MPI *)calloc_1d_array(send_buf[0], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             
             err = MPI_Isend(&(send_buf[0]), 1, MPI_INTEGER, pGrid->lx1_id, RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
@@ -156,7 +153,7 @@ void bvals_tracer(DomainS *pD) {
             send_buf[1] = pack_ox1_mc(pGrid);
             
              // calloc tracer buffer for send to r
-            if((send_buf_mc1x1 = (MCtracer_MPI *)calloc_1d_array(send_buf[1], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc1x1 = (Tracer_MPI *)calloc_1d_array(send_buf[1], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             
             err = MPI_Isend(&(send_buf[1]), 1, MPI_INTEGER, pGrid->rx1_id, LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
@@ -169,40 +166,40 @@ void bvals_tracer(DomainS *pD) {
             
             if (mIndex == 0) {
                 /* calloc buffer for tracer receives from l */
-                if((recv_buf_mc0x1 = (MCtracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc0x1 = (Tracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             if (mIndex == 1) {
                 /* calloc buffer for tracer recevies from r */
-                if((recv_buf_mc1x1 = (MCtracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc1x1 = (Tracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             err = MPI_Waitany(2, recv_rq, &mIndex,MPI_STATUS_IGNORE);
             if (mIndex == 0) {
                 /* calloc buffer for tracer receives from l */
-                if((recv_buf_mc0x1 = (MCtracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc0x1 = (Tracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             if (mIndex == 1) {
                 /* calloc buffer for tracer recevies from r */
-                if((recv_buf_mc1x1 = (MCtracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc1x1 = (Tracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
 
 //             Post non-blocking receives for tracers from L and R Grids 
-            err = MPI_Irecv(&(recv_buf_mc0x1[0]),recv_buf[0],pD->MCTRACERTYPE,pGrid->lx1_id,LtoR_tag,
+            err = MPI_Irecv(&(recv_buf_mc0x1[0]),recv_buf[0],pD->TRACERTYPE,pGrid->lx1_id,LtoR_tag,
                              pD->Comm_Domain, &(recv_rq[0]));
-            err = MPI_Irecv(&(recv_buf_mc1x1[0]),recv_buf[1],pD->MCTRACERTYPE,pGrid->rx1_id,RtoL_tag,
+            err = MPI_Irecv(&(recv_buf_mc1x1[0]),recv_buf[1],pD->TRACERTYPE,pGrid->rx1_id,RtoL_tag,
                              pD->Comm_Domain, &(recv_rq[1]));
             
             /* pack and send data L and R */
             pack_ix1_tracers(pGrid);
-
-            err = MPI_Isend(&(send_buf_mc0x1[0]),send_buf[0],pD->MCTRACERTYPE,pGrid->lx1_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            
+            err = MPI_Isend(&(send_buf_mc0x1[0]),send_buf[0],pD->TRACERTYPE,pGrid->lx1_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
 
             pack_ox1_tracers(pGrid);
 
-            err = MPI_Isend(&(send_buf_mc1x1[0]),send_buf[1],pD->MCTRACERTYPE,pGrid->rx1_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_mc1x1[0]),send_buf[1],pD->TRACERTYPE,pGrid->rx1_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
 
             /* check non-blocking sends have completed. */
             err = MPI_Waitall(2,send_rq, MPI_STATUS_IGNORE);
@@ -212,12 +209,12 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Waitany(2,recv_rq,&mIndex,MPI_STATUS_IGNORE);
             
             /* Post non-blocking receives for list structures from L and R Grids */
-            err = MPI_Irecv(&(recv_buf_list0x1[0]), cnt, pD->MCLISTTYPE, pGrid->lx1_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
-            err = MPI_Irecv(&(recv_buf_list1x1[0]), cnt, pD->MCLISTTYPE, pGrid->rx1_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
+            err = MPI_Irecv(&(recv_buf_list0x1[0]), cnt, pD->LISTTYPE, pGrid->lx1_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
+            err = MPI_Irecv(&(recv_buf_list1x1[0]), cnt, pD->LISTTYPE, pGrid->rx1_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
             
             /* Send list structures L and R */
-            err = MPI_Isend(&(send_buf_list0x1[0]), cnt, pD->MCLISTTYPE,pGrid->lx1_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
-            err = MPI_Isend(&(send_buf_list1x1[0]), cnt, pD->MCLISTTYPE,pGrid->rx1_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_list0x1[0]), cnt, pD->LISTTYPE,pGrid->lx1_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_list1x1[0]), cnt, pD->LISTTYPE,pGrid->rx1_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Waitall(2, send_rq, MPI_STATUS_IGNORE);
@@ -238,6 +235,7 @@ void bvals_tracer(DomainS *pD) {
             if (recv_buf_mc1x1) free_1d_array(recv_buf_mc1x1);
             if (send_buf_mc0x1) free_1d_array(send_buf_mc0x1);
             if (send_buf_mc1x1) free_1d_array(send_buf_mc1x1);
+        
         }
     
         /* Physical boundary on left, MPI block on right */
@@ -250,7 +248,7 @@ void bvals_tracer(DomainS *pD) {
             send_buf[1] = pack_ox1_mc(pGrid);
             
             /* calloc tracer buffer for send to r */
-            if((send_buf_mc1x1 = (MCtracer_MPI *)calloc_1d_array(send_buf[1], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc1x1 = (Tracer_MPI *)calloc_1d_array(send_buf[1], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
 
             err = MPI_Isend(&(send_buf[1]), 1, MPI_INTEGER, pGrid->rx1_id, LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
@@ -265,16 +263,16 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[1]), MPI_STATUS_IGNORE);
 
             /* calloc buffer for tracer recevies from r */
-            if((recv_buf_mc1x1 = (MCtracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(MCtracer_MPI))) == NULL)
+            if((recv_buf_mc1x1 = (Tracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
 
             /* Post non-blocking receives for tracers from R Grids */
-            err = MPI_Irecv(&(recv_buf_mc1x1[0]),recv_buf[1],pD->MCTRACERTYPE,pGrid->rx1_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
+            err = MPI_Irecv(&(recv_buf_mc1x1[0]),recv_buf[1],pD->TRACERTYPE,pGrid->rx1_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
 
             /* pack and send tracers R */
             pack_ox1_tracers(pGrid);
 
-            err = MPI_Isend(&(send_buf_mc1x1[0]),send_buf[1],pD->MCTRACERTYPE,pGrid->rx1_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_mc1x1[0]),send_buf[1],pD->TRACERTYPE,pGrid->rx1_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
 
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[1]), MPI_STATUS_IGNORE);
@@ -283,10 +281,10 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[1]), MPI_STATUS_IGNORE);
 
             /* Post non-blocking receives for list structures from R Grid */
-            err = MPI_Irecv(&(recv_buf_list1x1[0]),cnt, pD->MCLISTTYPE, pGrid->rx1_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
+            err = MPI_Irecv(&(recv_buf_list1x1[0]),cnt, pD->LISTTYPE, pGrid->rx1_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
             
             /* Send list structures R */
-            err = MPI_Isend(&(send_buf_list1x1[0]),cnt, pD->MCLISTTYPE, pGrid->rx1_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_list1x1[0]),cnt, pD->LISTTYPE, pGrid->rx1_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[1]), MPI_STATUS_IGNORE);
@@ -314,7 +312,7 @@ void bvals_tracer(DomainS *pD) {
             send_buf[0] = pack_ix1_mc(pGrid);
             
             /* calloc tracer buffer for send to L */
-            if((send_buf_mc0x1 = (MCtracer_MPI *)calloc_1d_array(send_buf[0], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc0x1 = (Tracer_MPI *)calloc_1d_array(send_buf[0], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             
             err = MPI_Isend(&(send_buf[0]), 1, MPI_INTEGER, pGrid->lx1_id, RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
@@ -329,16 +327,16 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[0]), MPI_STATUS_IGNORE);
             
             /* calloc buffer for tracer recevies from L */
-            if((recv_buf_mc0x1 = (MCtracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(MCtracer_MPI))) == NULL)
+            if((recv_buf_mc0x1 = (Tracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             
             /* Post non-blocking receives for tracers from L Grids */
-            err = MPI_Irecv(&(recv_buf_mc0x1[0]),recv_buf[0],pD->MCTRACERTYPE,pGrid->lx1_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
+            err = MPI_Irecv(&(recv_buf_mc0x1[0]),recv_buf[0],pD->TRACERTYPE,pGrid->lx1_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
 
             /* pack and send tracers L */
             pack_ix1_tracers(pGrid);
             
-            err = MPI_Isend(&(send_buf_mc0x1[0]),send_buf[0],pD->MCTRACERTYPE,pGrid->lx1_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_mc0x1[0]),send_buf[0],pD->TRACERTYPE,pGrid->lx1_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
 
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[0]), MPI_STATUS_IGNORE);
@@ -347,10 +345,10 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[0]), MPI_STATUS_IGNORE);
 
             /* Post non-blocking receives for list structures from L Grid */
-            err = MPI_Irecv(&(recv_buf_list0x1[0]),cnt, pD->MCLISTTYPE, pGrid->lx1_id, LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
+            err = MPI_Irecv(&(recv_buf_list0x1[0]),cnt, pD->LISTTYPE, pGrid->lx1_id, LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
             
             /* Send list structures L */
-            err = MPI_Isend(&(send_buf_list0x1[0]),cnt, pD->MCLISTTYPE, pGrid->lx1_id, RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_list0x1[0]),cnt, pD->LISTTYPE, pGrid->lx1_id, RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[0]), MPI_STATUS_IGNORE);
@@ -381,13 +379,13 @@ void bvals_tracer(DomainS *pD) {
 #ifdef MPI_PARALLEL
         cnt = (pGrid->Nx[0] + 2*nghost)*nghost*(pGrid->Nx[2]);
 
-        if((send_buf_list0x2 = (MClist_MPI *)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((send_buf_list0x2 = (TracerList_MPI *)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
-        if((send_buf_list1x2 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((send_buf_list1x2 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
-        if((recv_buf_list0x2 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((recv_buf_list0x2 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
-        if((recv_buf_list1x2 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((recv_buf_list1x2 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
 
         if (pGrid->rx2_id >= 0 && pGrid->lx2_id >= 0) {
@@ -400,7 +398,7 @@ void bvals_tracer(DomainS *pD) {
             send_buf[0] = pack_ix2_mc(pGrid);
             
             /* calloc tracer buffer for send to l */
-            if((send_buf_mc0x2 = (MCtracer_MPI *)calloc_1d_array(send_buf[0], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc0x2 = (Tracer_MPI *)calloc_1d_array(send_buf[0], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             err = MPI_Isend(&(send_buf[0]), 1, MPI_INTEGER, pGrid->lx2_id, RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
 
@@ -408,7 +406,7 @@ void bvals_tracer(DomainS *pD) {
             send_buf[1] = pack_ox2_mc(pGrid);
             
             /* calloc tracer buffer for send to r */
-            if((send_buf_mc1x2 = (MCtracer_MPI *)calloc_1d_array(send_buf[1], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc1x2 = (Tracer_MPI *)calloc_1d_array(send_buf[1], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             err = MPI_Isend(&(send_buf[1]), 1, MPI_INTEGER, pGrid->rx2_id, LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
@@ -419,38 +417,38 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Waitany(2, recv_rq, &mIndex, MPI_STATUS_IGNORE);
             if (mIndex == 0) {
                 /* calloc buffer for tracer receives from l */
-                if((recv_buf_mc0x2 = (MCtracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc0x2 = (Tracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             if (mIndex == 1) {
                 /* calloc buffer for tracer recevies from r */
-                if((recv_buf_mc1x2 = (MCtracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc1x2 = (Tracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             err = MPI_Waitany(2, recv_rq, &mIndex,MPI_STATUS_IGNORE);
             if (mIndex == 0) {
                 /* calloc buffer for tracer receives from l */
-                if((recv_buf_mc0x2 = (MCtracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc0x2 = (Tracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             if (mIndex == 1) {
                 /* calloc buffer for tracer recevies from r */
-                if((recv_buf_mc1x2 = (MCtracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc1x2 = (Tracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             
             /* Post non-blocking receives for tracers from L and R Grids */
-            err = MPI_Irecv(&(recv_buf_mc0x2[0]),recv_buf[0],pD->MCTRACERTYPE,pGrid->lx2_id,LtoR_tag,
+            err = MPI_Irecv(&(recv_buf_mc0x2[0]),recv_buf[0],pD->TRACERTYPE,pGrid->lx2_id,LtoR_tag,
                             pD->Comm_Domain, &(recv_rq[0]));
-            err = MPI_Irecv(&(recv_buf_mc1x2[0]),recv_buf[1],pD->MCTRACERTYPE,pGrid->rx2_id,RtoL_tag,
+            err = MPI_Irecv(&(recv_buf_mc1x2[0]),recv_buf[1],pD->TRACERTYPE,pGrid->rx2_id,RtoL_tag,
                             pD->Comm_Domain, &(recv_rq[1]));
             
             /* pack and send data L and R */
             pack_ix2_tracers(pGrid);
-            err = MPI_Isend(&(send_buf_mc0x2[0]),send_buf[0],pD->MCTRACERTYPE,pGrid->lx2_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_mc0x2[0]),send_buf[0],pD->TRACERTYPE,pGrid->lx2_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
             
             pack_ox2_tracers(pGrid);
-            err = MPI_Isend(&(send_buf_mc1x2[0]),send_buf[1],pD->MCTRACERTYPE,pGrid->rx2_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_mc1x2[0]),send_buf[1],pD->TRACERTYPE,pGrid->rx2_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Waitall(2,send_rq, MPI_STATUS_IGNORE);
@@ -461,12 +459,12 @@ void bvals_tracer(DomainS *pD) {
         
             /* Post non-blocking receives for list structures from L and R Grids */
             
-            err = MPI_Irecv(&(recv_buf_list0x2[0]),cnt, pD->MCLISTTYPE, pGrid->lx2_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
-            err = MPI_Irecv(&(recv_buf_list1x2[0]),cnt, pD->MCLISTTYPE, pGrid->rx2_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
+            err = MPI_Irecv(&(recv_buf_list0x2[0]),cnt, pD->LISTTYPE, pGrid->lx2_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
+            err = MPI_Irecv(&(recv_buf_list1x2[0]),cnt, pD->LISTTYPE, pGrid->rx2_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
             
             /* Send list structures L and R */
-            err = MPI_Isend(&(send_buf_list0x2[0]),cnt, pD->MCLISTTYPE,pGrid->lx2_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
-            err = MPI_Isend(&(send_buf_list1x2[0]),cnt, pD->MCLISTTYPE,pGrid->rx2_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_list0x2[0]),cnt, pD->LISTTYPE,pGrid->lx2_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_list1x2[0]),cnt, pD->LISTTYPE,pGrid->rx2_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Waitall(2, send_rq, MPI_STATUS_IGNORE);
@@ -499,7 +497,7 @@ void bvals_tracer(DomainS *pD) {
             /* pack and send data size to R */
             send_buf[1] = pack_ox2_mc(pGrid);
             /* calloc tracer buffer for send to r */
-            if((send_buf_mc1x2 = (MCtracer_MPI *)calloc_1d_array(send_buf[1], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc1x2 = (Tracer_MPI *)calloc_1d_array(send_buf[1], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             err = MPI_Isend(&(send_buf[1]), 1, MPI_INTEGER, pGrid->rx2_id, LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
@@ -513,16 +511,16 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[1]), MPI_STATUS_IGNORE);
             
             /* calloc buffer for tracer recevies from r */
-            if((recv_buf_mc1x2 = (MCtracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(MCtracer_MPI))) == NULL)
+            if((recv_buf_mc1x2 = (Tracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             
             /* Post non-blocking receives for tracers from R Grids */
-            err = MPI_Irecv(&(recv_buf_mc1x2[0]),recv_buf[1],pD->MCTRACERTYPE,pGrid->rx2_id,RtoL_tag,
+            err = MPI_Irecv(&(recv_buf_mc1x2[0]),recv_buf[1],pD->TRACERTYPE,pGrid->rx2_id,RtoL_tag,
                             pD->Comm_Domain, &(recv_rq[1]));
             
             /* pack and send tracers R */
             pack_ox2_tracers(pGrid);
-            err = MPI_Isend(&(send_buf_mc1x2[0]),send_buf[1],pD->MCTRACERTYPE,pGrid->rx2_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_mc1x2[0]),send_buf[1],pD->TRACERTYPE,pGrid->rx2_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[1]), MPI_STATUS_IGNORE);
@@ -531,10 +529,10 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[1]), MPI_STATUS_IGNORE);
             
             /* Post non-blocking receives for list structures from R Grid */
-            err = MPI_Irecv(&(recv_buf_list1x2[0]),cnt, pD->MCLISTTYPE, pGrid->rx2_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
+            err = MPI_Irecv(&(recv_buf_list1x2[0]),cnt, pD->LISTTYPE, pGrid->rx2_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
             
             /* Send list structures R */
-            err = MPI_Isend(&(send_buf_list1x2[0]),cnt, pD->MCLISTTYPE,pGrid->rx2_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_list1x2[0]),cnt, pD->LISTTYPE,pGrid->rx2_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[1]), MPI_STATUS_IGNORE);
@@ -559,7 +557,7 @@ void bvals_tracer(DomainS *pD) {
             /* pack and send data size to L */
             send_buf[0] = pack_ix2_mc(pGrid);
             /* calloc tracer buffer for send to L */
-            if((send_buf_mc0x2 = (MCtracer_MPI *)calloc_1d_array(send_buf[0], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc0x2 = (Tracer_MPI *)calloc_1d_array(send_buf[0], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             err = MPI_Isend(&(send_buf[0]), 1, MPI_INTEGER, pGrid->lx2_id, RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
             
@@ -573,15 +571,15 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[0]), MPI_STATUS_IGNORE);
             
             /* calloc buffer for tracer recevies from L */
-            if((recv_buf_mc0x2 = (MCtracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(MCtracer_MPI))) == NULL)
+            if((recv_buf_mc0x2 = (Tracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             
             /* Post non-blocking receives for tracers from L Grids */
-            err = MPI_Irecv(&(recv_buf_mc0x2[0]),recv_buf[0],pD->MCTRACERTYPE,pGrid->lx2_id,LtoR_tag,pD->Comm_Domain, &(recv_rq[0]));
+            err = MPI_Irecv(&(recv_buf_mc0x2[0]),recv_buf[0],pD->TRACERTYPE,pGrid->lx2_id,LtoR_tag,pD->Comm_Domain, &(recv_rq[0]));
             
             /* pack and send tracers L */
             pack_ix2_tracers(pGrid);
-            err = MPI_Isend(&(send_buf_mc0x2[0]),send_buf[0],pD->MCTRACERTYPE,pGrid->lx2_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_mc0x2[0]),send_buf[0],pD->TRACERTYPE,pGrid->lx2_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[0]), MPI_STATUS_IGNORE);
@@ -590,10 +588,10 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[0]), MPI_STATUS_IGNORE);
             
             /* Post non-blocking receives for list structures from L Grid */
-            err = MPI_Irecv(&(recv_buf_list0x2[0]),cnt, pD->MCLISTTYPE, pGrid->lx2_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
+            err = MPI_Irecv(&(recv_buf_list0x2[0]),cnt, pD->LISTTYPE, pGrid->lx2_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
             
             /* Send list structures L */
-            err = MPI_Isend(&(send_buf_list0x2[0]),cnt, pD->MCLISTTYPE, pGrid->lx2_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_list0x2[0]),cnt, pD->LISTTYPE, pGrid->lx2_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[0]), MPI_STATUS_IGNORE);
@@ -626,13 +624,13 @@ void bvals_tracer(DomainS *pD) {
         
         cnt = (pGrid->Nx[0] + 2*nghost)*(pGrid->Nx[1] + 2*nghost)*nghost;
         
-        if((send_buf_list0x3 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((send_buf_list0x3 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
-        if((send_buf_list1x3 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((send_buf_list1x3 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
-        if((recv_buf_list0x3 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((recv_buf_list0x3 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
-        if((recv_buf_list1x3 = (MClist_MPI*)calloc_1d_array(cnt,sizeof(MClist_MPI))) == NULL)
+        if((recv_buf_list1x3 = (TracerList_MPI*)calloc_1d_array(cnt,sizeof(TracerList_MPI))) == NULL)
             ath_error("[bvals_init]: Failed to allocate send buffer\n");
         
         /* MPI blocks to both left and right */
@@ -647,14 +645,14 @@ void bvals_tracer(DomainS *pD) {
             send_buf[0] = pack_ix3_mc(pGrid);
             
             /* calloc tracer buffer for send to l */
-            if((send_buf_mc0x3 = (MCtracer_MPI *)calloc_1d_array(send_buf[0], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc0x3 = (Tracer_MPI *)calloc_1d_array(send_buf[0], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             err = MPI_Isend(&(send_buf[0]), 1, MPI_INTEGER, pGrid->lx3_id, RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
             
             send_buf[1] = pack_ox3_mc(pGrid);
             
             /* calloc tracer buffer for send to r */
-            if((send_buf_mc1x3 = (MCtracer_MPI *)calloc_1d_array(send_buf[1], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc1x3 = (Tracer_MPI *)calloc_1d_array(send_buf[1], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             
             err = MPI_Isend(&(send_buf[1]), 1, MPI_INTEGER, pGrid->rx3_id, LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
@@ -667,38 +665,38 @@ void bvals_tracer(DomainS *pD) {
             
             if (mIndex == 0) {
                 /* calloc buffer for tracer receives from l */
-                if((recv_buf_mc0x3 = (MCtracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc0x3 = (Tracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             if (mIndex == 1) {
                 /* calloc buffer for tracer recevies from r */
-                if((recv_buf_mc1x3 = (MCtracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc1x3 = (Tracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             err = MPI_Waitany(2, recv_rq, &mIndex,MPI_STATUS_IGNORE);
             if (mIndex == 0) {
                 /* calloc buffer for tracer receives from l */
-                if((recv_buf_mc0x3 = (MCtracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc0x3 = (Tracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             if (mIndex == 1) {
                 /* calloc buffer for tracer recevies from r */
-                if((recv_buf_mc1x3 = (MCtracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(MCtracer_MPI))) == NULL)
+                if((recv_buf_mc1x3 = (Tracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(Tracer_MPI))) == NULL)
                     ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             }
             
             /* Post non-blocking receives for tracers from L and R Grids */
-            err = MPI_Irecv(&(recv_buf_mc0x3[0]),recv_buf[0],pD->MCTRACERTYPE,pGrid->lx3_id,LtoR_tag,
+            err = MPI_Irecv(&(recv_buf_mc0x3[0]),recv_buf[0],pD->TRACERTYPE,pGrid->lx3_id,LtoR_tag,
                             pD->Comm_Domain, &(recv_rq[0]));
-            err = MPI_Irecv(&(recv_buf_mc1x3[0]),recv_buf[1],pD->MCTRACERTYPE,pGrid->rx3_id,RtoL_tag,
+            err = MPI_Irecv(&(recv_buf_mc1x3[0]),recv_buf[1],pD->TRACERTYPE,pGrid->rx3_id,RtoL_tag,
                             pD->Comm_Domain, &(recv_rq[1]));
             
             /* pack and send data L and R */
             pack_ix3_tracers(pGrid);
-            err = MPI_Isend(&(send_buf_mc0x3[0]),send_buf[0],pD->MCTRACERTYPE,pGrid->lx3_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_mc0x3[0]),send_buf[0],pD->TRACERTYPE,pGrid->lx3_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
             
             pack_ox3_tracers(pGrid);
-            err = MPI_Isend(&(send_buf_mc1x3[0]),send_buf[1],pD->MCTRACERTYPE,pGrid->rx3_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_mc1x3[0]),send_buf[1],pD->TRACERTYPE,pGrid->rx3_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Waitall(2,send_rq, MPI_STATUS_IGNORE);
@@ -709,12 +707,12 @@ void bvals_tracer(DomainS *pD) {
             
             /* Post non-blocking receives for list structures from L and R Grids */
             
-            err = MPI_Irecv(&(recv_buf_list0x3[0]),cnt, pD->MCLISTTYPE, pGrid->lx3_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
-            err = MPI_Irecv(&(recv_buf_list1x3[0]),cnt, pD->MCLISTTYPE, pGrid->rx3_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
+            err = MPI_Irecv(&(recv_buf_list0x3[0]),cnt, pD->LISTTYPE, pGrid->lx3_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
+            err = MPI_Irecv(&(recv_buf_list1x3[0]),cnt, pD->LISTTYPE, pGrid->rx3_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
             
             /* Send list structures L and R */
-            err = MPI_Isend(&(send_buf_list0x3[0]),cnt, pD->MCLISTTYPE,pGrid->lx3_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
-            err = MPI_Isend(&(send_buf_list1x3[0]),cnt, pD->MCLISTTYPE,pGrid->rx3_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_list0x3[0]),cnt, pD->LISTTYPE,pGrid->lx3_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_list1x3[0]),cnt, pD->LISTTYPE,pGrid->rx3_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Waitall(2, send_rq, MPI_STATUS_IGNORE);
@@ -747,7 +745,7 @@ void bvals_tracer(DomainS *pD) {
             /* pack and send data size to R */
             send_buf[1] = pack_ox3_mc(pGrid);
             /* calloc tracer buffer for send to r */
-            if((send_buf_mc1x3 = (MCtracer_MPI *)calloc_1d_array(send_buf[1], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc1x3 = (Tracer_MPI *)calloc_1d_array(send_buf[1], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
 
             err = MPI_Isend(&(send_buf[1]), 1, MPI_INTEGER, pGrid->rx3_id, LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
@@ -762,16 +760,16 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[1]), MPI_STATUS_IGNORE);
             
             /* calloc buffer for tracer recevies from r */
-            if((recv_buf_mc1x3 = (MCtracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(MCtracer_MPI))) == NULL)
+            if((recv_buf_mc1x3 = (Tracer_MPI *)calloc_1d_array(recv_buf[1], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
 
             /* Post non-blocking receives for tracers from R Grids */
-            err = MPI_Irecv(&(recv_buf_mc1x3[0]),recv_buf[1],pD->MCTRACERTYPE,pGrid->rx3_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
+            err = MPI_Irecv(&(recv_buf_mc1x3[0]),recv_buf[1],pD->TRACERTYPE,pGrid->rx3_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
             
             /* pack and send tracers R */
             pack_ox3_tracers(pGrid);
             
-            err = MPI_Isend(&(send_buf_mc1x3[0]),send_buf[1],pD->MCTRACERTYPE,pGrid->rx3_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_mc1x3[0]),send_buf[1],pD->TRACERTYPE,pGrid->rx3_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
 
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[1]), MPI_STATUS_IGNORE);
@@ -780,10 +778,10 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[1]), MPI_STATUS_IGNORE);
             
             /* Post non-blocking receives for list structures from R Grid */
-            err = MPI_Irecv(&(recv_buf_list1x3[0]),cnt, pD->MCLISTTYPE, pGrid->rx3_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
+            err = MPI_Irecv(&(recv_buf_list1x3[0]),cnt, pD->LISTTYPE, pGrid->rx3_id,RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
 
             /* Send list structures R */
-            err = MPI_Isend(&(send_buf_list1x3[0]),cnt, pD->MCLISTTYPE,pGrid->rx3_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
+            err = MPI_Isend(&(send_buf_list1x3[0]),cnt, pD->LISTTYPE,pGrid->rx3_id,LtoR_tag, pD->Comm_Domain, &(send_rq[1]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[1]), MPI_STATUS_IGNORE);
@@ -807,7 +805,7 @@ void bvals_tracer(DomainS *pD) {
             /* pack and send data size to L */
             send_buf[0] = pack_ix3_mc(pGrid);
             /* calloc tracer buffer for send to L */
-            if((send_buf_mc0x3 = (MCtracer_MPI *)calloc_1d_array(send_buf[0], sizeof(MCtracer_MPI))) == NULL)
+            if((send_buf_mc0x3 = (Tracer_MPI *)calloc_1d_array(send_buf[0], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
 
             err = MPI_Isend(&(send_buf[0]), 1, MPI_INTEGER, pGrid->lx3_id, RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
@@ -822,16 +820,16 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[0]), MPI_STATUS_IGNORE);
 
             /* calloc buffer for tracer recevies from L */
-            if((recv_buf_mc0x3 = (MCtracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(MCtracer_MPI))) == NULL)
+            if((recv_buf_mc0x3 = (Tracer_MPI *)calloc_1d_array(recv_buf[0], sizeof(Tracer_MPI))) == NULL)
                 ath_error("[bvals_init]: Failed to allocate recv buffer\n");
             
             /* Post non-blocking receives for tracers from L Grids */
-            err = MPI_Irecv(&(recv_buf_mc0x3[0]),recv_buf[0],pD->MCTRACERTYPE,pGrid->lx3_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
+            err = MPI_Irecv(&(recv_buf_mc0x3[0]),recv_buf[0],pD->TRACERTYPE,pGrid->lx3_id,LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
 
             /* pack and send tracers L */
             pack_ix3_tracers(pGrid);
 
-            err = MPI_Isend(&(send_buf_mc0x3[0]),send_buf[0],pD->MCTRACERTYPE,pGrid->lx3_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_mc0x3[0]),send_buf[0],pD->TRACERTYPE,pGrid->lx3_id,RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
 
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[0]), MPI_STATUS_IGNORE);
@@ -840,10 +838,10 @@ void bvals_tracer(DomainS *pD) {
             err = MPI_Wait(&(recv_rq[0]), MPI_STATUS_IGNORE);
             
             /* Post non-blocking receives for list structures from L Grid */
-            err = MPI_Irecv(&(recv_buf_list0x3[0]),cnt, pD->MCLISTTYPE, pGrid->lx3_id, LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
+            err = MPI_Irecv(&(recv_buf_list0x3[0]),cnt, pD->LISTTYPE, pGrid->lx3_id, LtoR_tag, pD->Comm_Domain, &(recv_rq[0]));
 
             /* Send list structures L */
-            err = MPI_Isend(&(send_buf_list0x3[0]),cnt, pD->MCLISTTYPE, pGrid->lx3_id, RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
+            err = MPI_Isend(&(send_buf_list0x3[0]),cnt, pD->LISTTYPE, pGrid->lx3_id, RtoL_tag, pD->Comm_Domain, &(send_rq[0]));
             
             /* check non-blocking sends have completed. */
             err = MPI_Wait(&(send_rq[0]), MPI_STATUS_IGNORE);
@@ -876,7 +874,10 @@ void bvals_tracer(DomainS *pD) {
     if (recv_rq) free_1d_array(recv_rq);
     if (send_rq) free_1d_array(send_rq);
     
-#endif
+#endif /* MPI_PARALLEL */
+    
+    printf("END MPI SECTION\n");
+    fflush(0);
     return;
 }
 
@@ -1244,7 +1245,7 @@ static void outflow_ox3_mc(GridS *pG)
 #ifdef MPI_PARALLEL
 static int pack_ix1_mc(GridS *pG)
 {
-    int is = pG->is, ie = pG->ie;
+    int is = pG->is;
     int js = pG->js, je = pG->je;
     int ks = pG->ks, ke = pG->ke;
     int i,j,k,n;
@@ -1263,7 +1264,7 @@ static int pack_ix1_mc(GridS *pG)
 
 static void pack_ix1_tracers(GridS *pG)
 {
-    int is = pG->is, ie = pG->ie;
+    int is = pG->is;
     int js = pG->js, je = pG->je;
     int ks = pG->ks, ke = pG->ke;
     int i,j,k,l,m;
@@ -1281,15 +1282,18 @@ static void pack_ix1_tracers(GridS *pG)
             m++;
             tracer = list->Head;
             while(tracer) {
-                send_buf_mc0x1[l][0] = (double)tracer->hist->id;
-                send_buf_mc0x1[l][1] = (double)tracer->hist->d_init;
-                send_buf_mc0x1[l][2] = (double)tracer->hist->i_init;
-                send_buf_mc0x1[l][3] = (double)tracer->hist->j_init;
-                send_buf_mc0x1[l][4] = (double)tracer->hist->k_init;
+                send_buf_mc0x1[l].id = (double)tracer->prop->id;
+                send_buf_mc0x1[l].d_init = (double)tracer->prop->d_init;
+                send_buf_mc0x1[l].i_init = (int)tracer->prop->i_init;
+                send_buf_mc0x1[l].j_init = (int)tracer->prop->j_init;
+                send_buf_mc0x1[l].k_init = (int)tracer->prop->k_init;
+#ifdef STAR_PARTICLE
+                send_buf_mc0x1[l].id_star = (int)tracer->prop->id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                send_buf_mc0x1[l][5] = (double)tracer->x1;
-                send_buf_mc0x1[l][6] = (double)tracer->x2;
-                send_buf_mc0x1[l][7] = (double)tracer->x3;
+                send_buf_mc0x1[l].x1 = (double)tracer->x1;
+                send_buf_mc0x1[l].x2 = (double)tracer->x2;
+                send_buf_mc0x1[l].x3 = (double)tracer->x3;
 #endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
@@ -1298,7 +1302,7 @@ static void pack_ix1_tracers(GridS *pG)
             tracer = list->Head;
             while(tracer) {
                 Next = tracer->Next;
-                mclist_remove(list, tracer);
+                tracer_list_remove(list, tracer);
                 free(tracer);
                 tracer = Next;
             }
@@ -1347,15 +1351,18 @@ static void pack_ox1_tracers(GridS *pG)
             m++;
             tracer = list->Head;
             while(tracer) {
-                send_buf_mc1x1[l][0] = (double)tracer->hist->id;
-                send_buf_mc1x1[l]]1] = (double)tracer->hist->d_init;
-                send_buf_mc1x1[l][2] = (double)tracer->hist->i_init;
-                send_buf_mc1x1[l][3] = (double)tracer->hist->j_init;
-                send_buf_mc1x1[l][4] = (double)tracer->hist->k_init;
+                send_buf_mc1x1[l].id = (double)tracer->prop->id;
+                send_buf_mc1x1[l].d_init = (double)tracer->prop->d_init;
+                send_buf_mc1x1[l].i_init = (int)tracer->prop->i_init;
+                send_buf_mc1x1[l].j_init = (int)tracer->prop->j_init;
+                send_buf_mc1x1[l].k_init = (int)tracer->prop->k_init;
+#ifdef STAR_PARTICLE
+                send_buf_mc1x1[l].id_star = (int)tracer->prop->id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                send_buf_mc1x1[l][5] = (double)tracer->x1;
-                send_buf_mc1x1[l][6] = (double)tracer->x2;
-                send_buf_mc1x1[l][7] = (double)tracer->x3;
+                send_buf_mc1x1[l].x1 = (double)tracer->x1;
+                send_buf_mc1x1[l].x2 = (double)tracer->x2;
+                send_buf_mc1x1[l].x3 = (double)tracer->x3;
 #endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
@@ -1364,7 +1371,7 @@ static void pack_ox1_tracers(GridS *pG)
             tracer = list->Head;
             while(tracer) {
                 Next = tracer->Next;
-                mclist_remove(list, tracer);
+                tracer_list_remove(list, tracer);
                 free(tracer);
                 tracer = Next;
             }
@@ -1414,15 +1421,18 @@ static void pack_ix2_tracers(GridS *pG)
             m++;
             tracer = list->Head;
             while(tracer) {
-                send_buf_mc0x2[l][0] = (double)tracer->hist->id;
-                send_buf_mc0x2[l][1] = (double)tracer->hist->d_init;
-                send_buf_mc0x2[l][2] = (double)tracer->hist->i_init;
-                send_buf_mc0x2[l][3] = (double)tracer->hist->j_init;
-                send_buf_mc0x2[l][4] = (double)tracer->hist->k_init;
+                send_buf_mc0x2[l].id = (double)tracer->prop->id;
+                send_buf_mc0x2[l].d_init = (double)tracer->prop->d_init;
+                send_buf_mc0x2[l].i_init = (int)tracer->prop->i_init;
+                send_buf_mc0x2[l].j_init = (int)tracer->prop->j_init;
+                send_buf_mc0x2[l].k_init = (int)tracer->prop->k_init;
+#ifdef STAR_PARTICLE
+                send_buf_mc0x2[l].id_star = (int)tracer->prop->id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                send_buf_mc0x2[l][5] = (double)tracer->x1;
-                send_buf_mc0x2[l][6] = (double)tracer->x2;
-                send_buf_mc0x2[l][7] = (double)tracer->x3;
+                send_buf_mc0x2[l].x1 = (double)tracer->x1;
+                send_buf_mc0x2[l].x2 = (double)tracer->x2;
+                send_buf_mc0x2[l].x3 = (double)tracer->x3;
 #endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
@@ -1431,7 +1441,7 @@ static void pack_ix2_tracers(GridS *pG)
             tracer = list->Head;
             while(tracer) {
                 Next = tracer->Next;
-                mclist_remove(list, tracer);
+                tracer_list_remove(list, tracer);
                 free(tracer);
                 tracer = Next;
             }
@@ -1478,15 +1488,18 @@ static void pack_ox2_tracers(GridS *pG)
             m++;
             tracer = list->Head;
             while(tracer) {
-                send_buf_mc1x2[l][0] = (double)tracer->hist->id;
-                send_buf_mc1x2[l][1] = (double)tracer->hist->d_init;
-                send_buf_mc1x2[l][2] = (double)tracer->hist->i_init;
-                send_buf_mc1x2[l][3] = (double)tracer->hist->j_init;
-                send_buf_mc1x2[l][4] = (double)tracer->hist->k_init;
+                send_buf_mc1x2[l].id = (double)tracer->prop->id;
+                send_buf_mc1x2[l].d_init = (double)tracer->prop->d_init;
+                send_buf_mc1x2[l].i_init = (int)tracer->prop->i_init;
+                send_buf_mc1x2[l].j_init = (int)tracer->prop->j_init;
+                send_buf_mc1x2[l].k_init = (int)tracer->prop->k_init;
+#ifdef STAR_PARTICLE
+                send_buf_mc1x2[l].id_star = (int)tracer->prop->id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                send_buf_mc1x2[l][5] = (double)tracer->x1;
-                send_buf_mc1x2[l][6] = (double)tracer->x2;
-                send_buf_mc1x2[l][7] = (double)tracer->x3;
+                send_buf_mc1x2[l].x1 = (double)tracer->x1;
+                send_buf_mc1x2[l].x2 = (double)tracer->x2;
+                send_buf_mc1x2[l].x3 = (double)tracer->x3;
 #endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
@@ -1495,7 +1508,7 @@ static void pack_ox2_tracers(GridS *pG)
             tracer = list->Head;
             while(tracer) {
                 Next = tracer->Next;
-                mclist_remove(list, tracer);
+                tracer_list_remove(list, tracer);
                 free(tracer);
                 tracer = Next;
             }
@@ -1542,15 +1555,18 @@ static void pack_ix3_tracers(GridS *pG)
             m++;
             tracer = list->Head;
             while(tracer) {
-                send_buf_mc0x3[l][0] = (double)tracer->hist->id;
-                send_buf_mc0x3[l][1] = (double)tracer->hist->d_init;
-                send_buf_mc0x3[l][2] = (double)tracer->hist->i_init;
-                send_buf_mc0x3[l][3] = (double)tracer->hist->j_init;
-                send_buf_mc0x3[l][4] = (double)tracer->hist->k_init;
+                send_buf_mc0x3[l].x1 = (double)tracer->prop->id;
+                send_buf_mc0x3[l].d_init = (double)tracer->prop->d_init;
+                send_buf_mc0x3[l].i_init = (int)tracer->prop->i_init;
+                send_buf_mc0x3[l].j_init = (int)tracer->prop->j_init;
+                send_buf_mc0x3[l].k_init = (int)tracer->prop->k_init;
+#ifdef STAR_PARTICLE
+                send_buf_mc0x3[l].id_star = (int)tracer->prop->id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                send_buf_mc0x3[l][5] = (double)tracer->x1;
-                send_buf_mc0x3[l][6] = (double)tracer->x2;
-                send_buf_mc0x3[l][7] = (double)tracer->x3;
+                send_buf_mc0x3[l].x1 = (double)tracer->x1;
+                send_buf_mc0x3[l].x2 = (double)tracer->x2;
+                send_buf_mc0x3[l].x3 = (double)tracer->x3;
 #endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
@@ -1559,7 +1575,7 @@ static void pack_ix3_tracers(GridS *pG)
             tracer = list->Head;
             while(tracer) {
                 Next = tracer->Next;
-                mclist_remove(list, tracer);
+                tracer_list_remove(list, tracer);
                 if(tracer) free(tracer);
                 tracer = Next;
             }
@@ -1589,15 +1605,18 @@ static void pack_ox3_tracers(GridS *pG)
             m++;
             tracer = list->Head;
             while(tracer) {
-                send_buf_mc1x3[l][0] = (double)tracer->hist->id;
-                send_buf_mc1x3[l][1] = (double)tracer->hist->d_init;
-                send_buf_mc1x3[l][2] = (double)tracer->hist->i_init;
-                send_buf_mc1x3[l][3] = (double)tracer->hist->j_init;
-                send_buf_mc1x3[l][4] = (double)tracer->hist->k_init;
+                send_buf_mc1x3[l].id = (double)tracer->prop->id;
+                send_buf_mc1x3[l].d_init = (double)tracer->prop->d_init;
+                send_buf_mc1x3[l].i_init = (int)tracer->prop->i_init;
+                send_buf_mc1x3[l].j_init = (int)tracer->prop->j_init;
+                send_buf_mc1x3[l].k_init = (int)tracer->prop->k_init;
+#ifdef STAR_PARTICLE
+                send_buf_mc1x3[l].id_star = (int)tracer->prop->id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                send_buf_mc1x1[l][5] = (double)tracer->x1;
-                send_buf_mc1x1[l][6] = (double)tracer->x2;
-                send_buf_mc1x1[l][7] = (double)tracer->x3;
+                send_buf_mc1x3[l].x1 = (double)tracer->x1;
+                send_buf_mc1x3[l].x2 = (double)tracer->x2;
+                send_buf_mc1x3[l].x3 = (double)tracer->x3;
 #endif /* VFTRACERS */
                 l++;
                 Next = tracer->Next;
@@ -1606,7 +1625,7 @@ static void pack_ox3_tracers(GridS *pG)
             tracer = list->Head;
             while(tracer) {
                 Next = tracer->Next;
-                mclist_remove(list, tracer);
+                tracer_list_remove(list, tracer);
                 if(tracer) free(tracer);
                 tracer = Next;
             }
@@ -1850,8 +1869,8 @@ static void unpack_ix1_mc(GridS *pG)
     int i,j,k,l,m,n, count;
     TracerListS *list;
     TracerS *tracer;
-    MCtracer_MPI *mpi;
-    MChistS *hist;
+    Tracer_MPI *mpi;
+    TracerPropS *prop;
     
     l = 0;
     m = 0;
@@ -1861,23 +1880,28 @@ static void unpack_ix1_mc(GridS *pG)
             list = &((pG->GridLists)[k][j][i]);
             count = recv_buf_list0x1[l].count;
             for (n=1; n<=count; n++) {
-                tracer = init_mctracer(get_tracer_id());
-                hist = (MChistS *)malloc(sizeof(MChistS));
-                hist->id = (double)recv_buf_mc0x1[m][0];
-                hist->d_init = (double)recv_buf_mc0x1[m][1];
-                hist->i_init = (int)recv_buf_mc0x1[m][2];
-                hist->j_init = (int)recv_buf_mc0x1[m][3];
-                hist->k_init = (int)recv_buf_mc0x1[m][4];
+                tracer = init_tracer();
+                prop = (TracerPropS *)malloc(sizeof(TracerPropS));
+                prop->id = (double)recv_buf_mc0x1[m].id;
+                prop->d_init = (double)recv_buf_mc0x1[m].d_init;
+                prop->i_init = (int)recv_buf_mc0x1[m].i_init;
+                prop->j_init = (int)recv_buf_mc0x1[m].j_init;
+                prop->k_init = (int)recv_buf_mc0x1[m].k_init;
+#ifdef STAR_PARTICLE
+                prop->id_star = (int)recv_buf_mc0x1[m].id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                tracer->x1 = (double)recv_buf_mc0x1[m][5];
-                tracer->x2 = (double)recv_buf_mc0x1[m][6];
-                tracer->x3 = (double)recv_buf_mc0x1[m][7];
-#endif
-                tracer->hist = hist;
-                mclist_add(list,tracer);
+                tracer->x1 = (double)recv_buf_mc0x1[m].x1;
+                tracer->x2 = (double)recv_buf_mc0x1[m].x2;
+                tracer->x3 = (double)recv_buf_mc0x1[m].x3;
+#endif /* VFTRACERS */
+                tracer->prop = prop;
+                Tracerlist_add(list,tracer);
                 m++;
             }
+#ifdef MCTRACERS
             list->Rmass = pG->U[k][j][i].d;
+#endif /* MCTRACERS */
             l++;
         }
     }
@@ -1891,8 +1915,8 @@ static void unpack_ox1_mc(GridS *pG)
     int i,j,k,l,m,n,count;
     TracerListS *list;
     TracerS *tracer;
-    MCtracer_MPI *mpi;
-    MChistS *hist;
+    Tracer_MPI *mpi;
+    TracerPropS *prop;
     
     l = 0;
     m = 0;
@@ -1902,23 +1926,29 @@ static void unpack_ox1_mc(GridS *pG)
             list = &((pG->GridLists)[k][j][i]);
             count = recv_buf_list1x1[l].count;
             for (n=1; n<=count; n++) {
-                tracer = init_mctracer(get_tracer_id());
-                hist = (MChistS *)malloc(sizeof(MChistS));
-                hist->id = (double)recv_buf_mc1x1[m][0];
-                hist->d_init = (double)recv_buf_mc1x1[m][1];
-                hist->i_init = (int)recv_buf_mc1x1[m][2];
-                hist->j_init = (int)recv_buf_mc1x1[m][3];
-                hist->k_init = (int)recv_buf_mc1x1[m][4];
+                tracer = init_tracer();
+                prop = (TracerPropS *)malloc(sizeof(TracerPropS));
+                assert(recv_buf_mc1x1 != NULL);
+                prop->id = (double)recv_buf_mc1x1[m].id;
+                prop->d_init = (double)recv_buf_mc1x1[m].d_init;
+                prop->i_init = (int)recv_buf_mc1x1[m].i_init;
+                prop->j_init = (int)recv_buf_mc1x1[m].j_init;
+                prop->k_init = (int)recv_buf_mc1x1[m].k_init;
+#ifdef STAR_PARTICLE
+                prop->id_star = (int)recv_buf_mc1x1[m].id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                tracer->x1 = (double)recv_buf_mc1x1[m][5];
-                tracer->x2 = (double)recv_buf_mc1x1[m][6];
-                tracer->x3 = (double)recv_buf_mc1x1[m][7];
-#endif
-                tracer->hist = hist;
-                mclist_add(list,tracer);
+                tracer->x1 = (double)recv_buf_mc1x1[m].x1;
+                tracer->x2 = (double)recv_buf_mc1x1[m].x2;
+                tracer->x3 = (double)recv_buf_mc1x1[m].x3;
+#endif /* VFTRACERS */
+                tracer->prop = prop;
+                Tracerlist_add(list,tracer);
                 m++;
             }
+#ifdef MCTRACERS
             list->Rmass = pG->U[k][j][i].d;
+#endif /* MCTRACERS */
             l++;
         }
     }
@@ -1932,8 +1962,8 @@ static void unpack_ix2_mc(GridS *pG)
     int i,j,k,l,m,n,count;
     TracerListS *list;
     TracerS *tracer;
-    MCtracer_MPI *mpi;
-    MChistS *hist;
+    Tracer_MPI *mpi;
+    TracerPropS *prop;
     l = 0;
     m = 0;
     for (k=ks; k<=ke; k++) {
@@ -1942,23 +1972,28 @@ static void unpack_ix2_mc(GridS *pG)
             list = &((pG->GridLists)[k][j][i]);
             count = recv_buf_list0x2[l].count;
             for (n=1; n<=count; n++) {
-                tracer = init_mctracer(get_tracer_id());
-                hist = (MChistS *)malloc(sizeof(MChistS));
-                hist->id = (double)recv_buf_mc0x2[m][0];
-                hist->d_init = (double)recv_buf_mc0x2[m][1];
-                hist->i_init = (int)recv_buf_mc0x2[m][2];
-                hist->j_init = (int)recv_buf_mc0x2[m][3];
-                hist->k_init = (int)recv_buf_mc0x2[m][4];
+                tracer = init_tracer();
+                prop = (TracerPropS *)malloc(sizeof(TracerPropS));
+                prop->id = (double)recv_buf_mc0x2[m].id;
+                prop->d_init = (double)recv_buf_mc0x2[m].d_init;
+                prop->i_init = (int)recv_buf_mc0x2[m].i_init;
+                prop->j_init = (int)recv_buf_mc0x2[m].j_init;
+                prop->k_init = (int)recv_buf_mc0x2[m].k_init;
+#ifdef STAR_PARTICLE
+                prop->id_star = (int)recv_buf_mc0x2[m].id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                tracer->x1 = (double)recv_buf_mc0x2[m][5];
-                tracer->x2 = (double)recv_buf_mc0x2[m][6];
-                tracer->x3 = (double)recv_buf_mc0x2[m][7];
-#endif
-                tracer->hist = hist;
-                mclist_add(list,tracer);
+                tracer->x1 = (double)recv_buf_mc0x2[m].x1;
+                tracer->x2 = (double)recv_buf_mc0x2[m].x2;
+                tracer->x3 = (double)recv_buf_mc0x2[m].x3;
+#endif /* VFTRACERS */
+                tracer->prop = prop;
+                Tracerlist_add(list,tracer);
                 m++;
             }
+#ifdef MCTRACERS
             list->Rmass = pG->U[k][j][i].d;
+#endif /* MCTRACERS */
             l++;
         }
     }
@@ -1972,8 +2007,8 @@ static void unpack_ox2_mc(GridS *pG)
     int i,j,k,l,m,n,count;
     TracerListS *list;
     TracerS *tracer;
-    MCtracer_MPI *mpi;
-    MChistS *hist;
+    Tracer_MPI *mpi;
+    TracerPropS *prop;
     l = 0;
     m = 0;
     for (k=ks; k<=ke; k++){
@@ -1982,23 +2017,28 @@ static void unpack_ox2_mc(GridS *pG)
             list = &((pG->GridLists)[k][j][i]);
             count = recv_buf_list1x2[l].count;
             for (n=1; n<=count; n++) {
-                tracer = init_mctracer(get_tracer_id());
-                hist = (MChistS *)malloc(sizeof(MChistS));
-                hist->id = (double)recv_buf_mc1x2[m][0];
-                hist->d_init = (double)recv_buf_mc1x2[m][1];
-                hist->i_init = (int)recv_buf_mc1x2[m][2];
-                hist->j_init = (int)recv_buf_mc1x2[m][3];
-                hist->k_init = (int)recv_buf_mc1x2[m][4];
+                tracer = init_tracer();
+                prop = (TracerPropS *)malloc(sizeof(TracerPropS));
+                prop->id = (double)recv_buf_mc1x2[m].id;
+                prop->d_init = (double)recv_buf_mc1x2[m].d_init;
+                prop->i_init = (int)recv_buf_mc1x2[m].i_init;
+                prop->j_init = (int)recv_buf_mc1x2[m].j_init;
+                prop->k_init = (int)recv_buf_mc1x2[m].k_init;
+#ifdef STAR_PARTICLE
+                prop->id_star = (int)recv_buf_mc1x2[m].id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                tracer->x1 = (double)recv_buf_mc1x2[m][5];
-                tracer->x2 = (double)recv_buf_mc1x2[m][6];
-                tracer->x3 = (double)recv_buf_mc1x2[m][7];
-#endif
-                tracer->hist = hist;
-                mclist_add(list,tracer);
+                tracer->x1 = (double)recv_buf_mc1x2[m].x1;
+                tracer->x2 = (double)recv_buf_mc1x2[m].x2;
+                tracer->x3 = (double)recv_buf_mc1x2[m].x3;
+#endif /* VFTRACERS */
+                tracer->prop = prop;
+                Tracerlist_add(list,tracer);
                 m++;
             }
+#ifdef MCTRACERS
             list->Rmass = pG->U[k][j][i].d;
+#endif /* MCTRACERS */
             l++;
         }
     }
@@ -2012,8 +2052,8 @@ static void unpack_ix3_mc(GridS *pG)
     int i,j,k,l,m,n,count;
     TracerListS *list;
     TracerS *tracer;
-    MCtracer_MPI *mpi;
-    MChistS *hist;
+    Tracer_MPI *mpi;
+    TracerPropS *prop;
     l = 0;
     m = 0;
     k = ks;
@@ -2022,23 +2062,28 @@ static void unpack_ix3_mc(GridS *pG)
             list = &((pG->GridLists)[k][j][i]);
             count = recv_buf_list0x3[l].count;
             for (n=1; n<=count; n++) {
-                tracer = init_mctracer(get_tracer_id());
-                hist = (MChistS *)malloc(sizeof(MChistS));
-                hist->id = (double)recv_buf_mc0x3[m][0];
-                hist->d_init = (double)recv_buf_mc0x3[m][1];
-                hist->i_init = (int)recv_buf_mc0x3[m][2];
-                hist->j_init = (int)recv_buf_mc0x3[m][3];
-                hist->k_init = (int)recv_buf_mc0x3[m][4];
+                tracer = init_tracer();
+                prop = (TracerPropS *)malloc(sizeof(TracerPropS));
+                prop->id = (double)recv_buf_mc0x3[m].id;
+                prop->d_init = (double)recv_buf_mc0x3[m].d_init;
+                prop->i_init = (int)recv_buf_mc0x3[m].i_init;
+                prop->j_init = (int)recv_buf_mc0x3[m].j_init;
+                prop->k_init = (int)recv_buf_mc0x3[m].k_init;
+#ifdef STAR_PARTICLE
+                prop->id_star = (int)recv_buf_mc0x3[m].id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                tracer->x1 = (double)recv_buf_mc0x3[m][5];
-                tracer->x2 = (double)recv_buf_mc0x3[m][6];
-                tracer->x3 = (double)recv_buf_mc0x3[m][7];
-#endif
-                tracer->hist = hist;
-                mclist_add(list,tracer);
+                tracer->x1 = (double)recv_buf_mc0x3[m].x1;
+                tracer->x2 = (double)recv_buf_mc0x3[m].x2;
+                tracer->x3 = (double)recv_buf_mc0x3[m].x3;
+#endif /* VFtRACERS */
+                tracer->prop = prop;
+                Tracerlist_add(list,tracer);
                 m++;
             }
+#ifdef MCTRACERS
             list->Rmass = pG->U[k][j][i].d;
+#endif /* MCTRACERS */
             l++;
         }
     }
@@ -2052,8 +2097,8 @@ static void unpack_ox3_mc(GridS *pG)
     int i,j,k,l,m,n,count;
     TracerListS *list;
     TracerS *tracer;
-    MCtracer_MPI *mpi;
-    MChistS *hist;
+    Tracer_MPI *mpi;
+    TracerPropS *prop;
     l = 0;
     m = 0;
     k = ke;
@@ -2062,23 +2107,28 @@ static void unpack_ox3_mc(GridS *pG)
             list = &((pG->GridLists)[k][j][i]);
             count = recv_buf_list1x3[l].count;
             for (n=1; n<=count; n++) {
-                tracer = init_mctracer(get_tracer_id());
-                hist = (MChistS *)malloc(sizeof(MChistS));
-                hist->id = (double)recv_buf_mc1x3[m][0];
-                hist->d_init = (double)recv_buf_mc1x3[m][1];
-                hist->i_init = (int)recv_buf_mc1x3[m][2];
-                hist->j_init = (int)recv_buf_mc1x3[m][3];
-                hist->k_init = (int)recv_buf_mc1x3[m][4];
+                tracer = init_tracer();
+                prop = (TracerPropS *)malloc(sizeof(TracerPropS));
+                prop->id = (double)recv_buf_mc1x3[m].id;
+                prop->d_init = (double)recv_buf_mc1x3[m].d_init;
+                prop->i_init = (int)recv_buf_mc1x3[m].i_init;
+                prop->j_init = (int)recv_buf_mc1x3[m].j_init;
+                prop->k_init = (int)recv_buf_mc1x3[m].k_init;
+#ifdef STAR_PARTICLE
+                prop->id_star = (int)recv_buf_mc1x3[m].id_star;
+#endif /* STAR_PARTICLE */
 #ifdef VFTRACERS
-                tracer->x1 = (double)recv_buf_mc1x3[m][5];
-                tracer->x2 = (double)recv_buf_mc1x3[m][6];
-                tracer->x3 = (double)recv_buf_mc1x3[m][7];
-#endif
-                tracer->hist = hist;
-                mclist_add(list, tracer);
+                tracer->x1 = (double)recv_buf_mc1x3[m].x1;
+                tracer->x2 = (double)recv_buf_mc1x3[m].x2;
+                tracer->x3 = (double)recv_buf_mc1x3[m].x3;
+#endif /* VFTRACERS */
+                tracer->prop = prop;
+                Tracerlist_add(list, tracer);
                 m++;
             }
+#ifdef MCTRACERS
             list->Rmass = pG->U[k][j][i].d;
+#endif /* MCTRACERS */
             l++;
         }
     }

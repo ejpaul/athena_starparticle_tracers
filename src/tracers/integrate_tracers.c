@@ -187,6 +187,7 @@ void prob_iterate_x2(TracerListS *list, double pflux, GridS *pG)
 /*----------------------------------------------------------------------------*/
 /* Iterate through list and determine tracers to be moved */
 /*----------------------------------------------------------------------------*/
+
 void prob_iterate_x3(TracerListS *list, double pflux, GridS *pG)
 {
     TracerS *pnode;
@@ -214,6 +215,32 @@ void prob_iterate_x3(TracerListS *list, double pflux, GridS *pG)
         pnode = pnode->Next;
     }
 }
+
+/*----------------------------------------------------------------------------*/
+/* Mark tracers within control volume when star particle created   */
+/* ic, jc, kc are the indices of the new star particle */
+/*----------------------------------------------------------------------------*/
+#ifdef STAR_PARTICLE
+void flag_tracer_star(GridS *pG, int ic, int jc, int kc, int star_id)
+{
+    int i, j, k;
+    TracerListS *list;
+    TracerS *tracer;
+    
+    for (k = kc-1; k <= kc+1; k++) {
+        for (j = jc-1; j <= jc+1; j++) {
+            for (i = ic-1; i <= ic+1; i++) {
+                list = &((pG->GridLists)[k][j][i]);
+                tracer = list->Head;
+                while(tracer) {
+                    tracer->prop->star_id = star_id;
+                    tracer = tracer->Next;
+                }
+            }
+        }
+    }
+}
+#endif /* STAR_PARTICLE */
 
 /*----------------------------------------------------------------------------*/
 /* Implement top hat algorithm */
@@ -267,4 +294,4 @@ void mc_tophat(GridS *pG)
     }
 }
 #endif /* TOPHAT */
-#endif
+#endif /* TRACERS */

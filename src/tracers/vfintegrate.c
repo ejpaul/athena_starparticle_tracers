@@ -157,8 +157,7 @@ void Integrate_vf_2nd_lower(DomainS *pD) {
                     getwei_TSC(pG, x1, x2, x3, cell1, weight, &i_s, &j_s, &k_s);
                     interp_prev(pG, weight, i_s, j_s, k_s, &v1_prev, &v2_prev, &v3_prev);
                     
-                    /* Predicted positions */
-                    /* v^(n+1/4) = 3/4*v^n + 1/4*v^(n+1) */
+                    /* Predicted positions */ 
                     xp1 = x1 + 0.5*pG->dt*(v1_prev);
                     xp2 = x2 + 0.5*pG->dt*(v2_prev);
                     xp3 = x3 + 0.5*pG->dt*(v3_prev);
