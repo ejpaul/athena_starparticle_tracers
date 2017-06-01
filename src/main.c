@@ -39,7 +39,6 @@ static char *athena_version = "version 4.0 - 01-Jul-2010";
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/times.h>
-#include <assert.h>
 #include <sys/types.h>
 #include "defs.h"
 #include "athena.h"
@@ -121,13 +120,8 @@ int main(int argc, char *argv[])
   char *pc, *suffix, new_name[MAXLEN];
   int len, h, m, s, err, use_wtlim=0;
   double wtend;
-    int DebugWait = 1;
-  int myid;
   if(MPI_SUCCESS != MPI_Init(&argc, &argv))
     ath_error("[main]: Error on calling MPI_Init\n");
-  MPI_Comm_rank(MPI_COMM_WORLD, &myid);
-    printf("PID = %d\n", myid);
-//    while(DebugWait);
 #endif /* MPI_PARALLEL */
 /*----------------------------------------------------------------------------*/
 /* Steps in main:
@@ -719,9 +713,6 @@ int main(int argc, char *argv[])
             
 #if defined(VFTRACERS) || defined(MCTRACERS)
           bvals_tracer(&(Mesh.Domain[nl][nd]));
-//#ifdef VFTRACERS
-//          vf_newijk(&(Mesh.Domain[nl][nd]));
-//#endif /* VFTRACERS */
 #endif /* TRACERS */
         }
       }

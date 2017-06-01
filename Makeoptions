@@ -17,7 +17,7 @@ MACHINE = default
 
 CC  = gcc
 LDR = gcc
-OPT = -g -Wall -W -std=c99 -pedantic
+OPT = -O3
 CUSTLIBS =
 MPIINC =
 MPILIB =
@@ -42,7 +42,7 @@ ifeq (NO_MCTRACERS, MCTRACERS)
     TRACERLIB = -L/usr/local/lib -lgsl -lgslcblas
     TRACERINC = -I/usr/local/include
 else
-ifeq (VFTRACERS, VFTRACERS)
+ifeq (NO_VFTRACERS, VFTRACERS)
     TRACERLIB = -L/usr/local/lib -lgsl -lgslcblas
     TRACERINC = -I/usr/local/include
 endif

@@ -211,7 +211,7 @@ void tracer_init_proportional(GridS *pG) {
     int i, j, k;
     TracerListS *list;
     Real d;
-    int n = par_geti("problem","N_proportional");
+    double n = par_geti("problem","N_proportional");
     is = pG->is;
     ie = pG->ie;
     js = pG->js;
@@ -287,6 +287,7 @@ void tracer_init_xlinflow(GridS *pG) {
 /*----------------------------------------------------------------------------*/
 /* Debugs MCLIST through assert statements */
 /*----------------------------------------------------------------------------*/
+#ifdef DEBUG
 void tracer_debug(GridS *pG) {
     int i, j, k, count, tot;
     int is = pG->is;
@@ -359,6 +360,7 @@ void tracer_debug(GridS *pG) {
     printf("Total # tracers: %d\n", tot);
     fflush(0);
 }
+#endif /* DEBUG */
 
 /*----------------------------------------------------------------------------*/
 /* Calculates unique id number for mc tracer */
@@ -390,6 +392,7 @@ void init_tracer_list(GridS *pG, TracerListS *list, int N)
     int k = list->k;
     TracerS *tracer;
     double rand;
+    int n;
     
     long s = time(NULL);
     int pid = myID_Comm_world;
@@ -404,7 +407,7 @@ void init_tracer_list(GridS *pG, TracerListS *list, int N)
     
     // Calculates cell-centered x,y,z given i,j,k
     cc_pos(pG, i, j, k, &x1, &x2, &x3);
-	for (int n = 1; n <= N; n++) {
+	for (n = 1; n <= N; n++) {
         /* Initialize tracer, add to tail of list */
 		tracer = init_tracer();
         tracer->prop = (TracerPropS *)malloc(sizeof(TracerPropS));
@@ -437,23 +440,24 @@ void Tracerlist_add(TracerListS *list, TracerS *tracer)
 {
     /* If nonempty list add to end */
 	if (list->Tail != NULL) {
+#ifdef DEBUG
         assert(list->Head);
         assert(list->count > 0);
         assert(list->Tail->Next == NULL);
-        
+#endif /* DEBUG */
 		list->Tail->Next = tracer;
         tracer->Prev = list->Tail;
 	}
     /* If empty list */
     else {
+#ifdef DEBUG
         assert(list->count == 0);
         assert(list->Tail == NULL);
         assert(list->Head == NULL);
-        
+#endif /* DEBUG */
         list->Head = tracer;
         tracer->Prev = NULL;
     }
-    
     list->Tail = tracer;
     tracer->Next = NULL;
     tracer->newList = NULL;
@@ -479,38 +483,46 @@ on_error:
     return NULL;
 }
 
-/*----------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
 /* Remove tracer from list  */
 /*----------------------------------------------------------------------------*/
 void tracer_list_remove(TracerListS *list, TracerS *pnode)
 {
     /* if pnode is only in list */
     if (!pnode->Prev && !pnode->Next) {
+#ifdef DEBUG
         assert(list->count == 1);
         assert(list->Head == pnode);
         assert(list->Tail == pnode);
+#endif /* DEBUG */
         
         list->Head = NULL;
         list->Tail = NULL;
     }
     /* if pnode is last in list (but not first) */
     else if (!pnode->Next) {
+#ifdef DEBUG
         assert(list->Tail == pnode);
+#endif /* DEBUG */
         
         list->Tail = pnode->Prev;
         list->Tail->Next = NULL;
     }
     /* if pnode is first in list (but not last) */
     else if (!pnode->Prev) {
+#ifdef DEBUG
         assert(list->Head == pnode);
+#endif /* DEBUG */
         
         list->Head = pnode->Next;
         list->Head->Prev = NULL;
     }
     /* If in middle of list */
     else {
+#ifdef DEBUG
         assert(pnode->Prev->Next == pnode);
         assert(pnode->Next->Prev == pnode);
+#endif /* DEBUG */
         
         pnode->Next->Prev = pnode->Prev;
         pnode->Prev->Next = pnode->Next;

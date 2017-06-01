@@ -68,7 +68,7 @@ dedt            = 1000.0    # energy input rate
 dtdrive         = 0.001     # time interval between drive
 klow            = 0.0       # low k cut-off in spectrum
 khigh           = 16.0      # high k cut-off in spectrum (recommend Nx/2)
-kpeak		= 8.0	    # peak k for G&O spectrum
+kpeak		    = 8.0	    # peak k for G&O spectrum
 expo            = 3.0       # exponent for power-law spectrum
 ispect          = 2         # power-law=1, G&O=2
 idrive          = 0         # driven=0, decaying=1

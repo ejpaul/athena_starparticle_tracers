@@ -30,7 +30,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include "../defs.h"
 #include "../athena.h"
 #include "../globals.h"
@@ -51,8 +50,8 @@ static Real **emf3P=NULL;
 static Cons1DS x1FD_i, x1FD_ip1, x2FD_j, x2FD_jp1;
 #ifdef MHD
 static Real emf3D_ji, emf3D_jip1, emf3D_jp1i, emf3D_jp1ip1;
-#endif
-#endif
+#endif /* MHD */
+#endif /* FOFC */
 
 /* The interface magnetic fields and emfs */
 #ifdef MHD
@@ -71,7 +70,7 @@ static ConsS **Uhalf=NULL;
 /* variables needed for H-correction of Sanders et al (1998) */
 #ifdef H_CORRECTION
 static Real **eta1=NULL, **eta2=NULL;
-#endif
+#endif /* H_CORRECTION */
 
 /*==============================================================================
  * PRIVATE FUNCTION PROTOTYPES: 
@@ -80,12 +79,12 @@ static Real **eta1=NULL, **eta2=NULL;
  *============================================================================*/
 #ifdef MHD
 static void integrate_emf3_corner(GridS *pG);
-#endif
+#endif /* MHD */
 #ifdef FIRST_ORDER_FLUX_CORRECTION
 static void FixCell(GridS *pG, Int3Vect);
 static void ApplyCorr(GridS *pG, int i, int j,
                       int lx1, int rx1, int lx2, int rx2);
-#endif
+#endif /* FOFC */
 
 /*=========================== PUBLIC FUNCTIONS ===============================*/
 /*----------------------------------------------------------------------------*/
@@ -109,13 +108,13 @@ void integrate_2d_vl(DomainS *pD)
   Real x1,x2,x3,phicl,phicr,phifc,phil,phir,phic,Bx;
 #if (NSCALARS > 0)
   int n;
-#endif
+#endif /* NSCALARS */
 #ifdef SELF_GRAVITY
   Real gxl,gxr,gyl,gyr,flx_m1l,flx_m1r,flx_m2l,flx_m2r;
-#endif
+#endif /* SELF_GRAVITY */
 #ifdef H_CORRECTION
   Real cfr,cfl,lambdar,lambdal;
-#endif
+#endif /* H_CORRECTION */
 #ifdef SHEARING_BOX
   Real M1n, dM2n, dM3n;   /* M1, dM2/3=(My+d*q*Omega_0*x) at time n */
   Real M1e, dM2e, dM3e;   /* M1, dM2/3 evolved by dt/2  */
@@ -126,12 +125,12 @@ void integrate_2d_vl(DomainS *pD)
 #ifdef STATIC_MESH_REFINEMENT
   int ncg,npg,dim;
   int ii,ics,ice,jj,jcs,jce,ips,ipe,jps,jpe;
-#endif
+#endif /* STATIC_MESH_REFINEMENT */
 #ifdef FIRST_ORDER_FLUX_CORRECTION
   int flag_cell=0,negd=0,negP=0,superl=0,NaNFlux=0;
   Real Vsq;
   Int3Vect BadCell;
-#endif
+#endif /* FOFC */
   int il=is-(nghost-1), iu=ie+(nghost-1);
   int jl=js-(nghost-1), ju=je+(nghost-1);
 
@@ -140,8 +139,8 @@ void integrate_2d_vl(DomainS *pD)
   const Real *r=pG->r,*ri=pG->ri;
 #ifdef FARGO
   Real Om,qshear;
-#endif
-#endif
+#endif /* FARGO */
+#endif /* CYLINDRICAL */
   Real lsf=1.0,rsf=1.0,g;
   Real dx1i=1.0/pG->dx1, dx2i=1.0/pG->dx2;
     
@@ -149,14 +148,14 @@ void integrate_2d_vl(DomainS *pD)
     TracerListS *list;
 #ifdef MCTRACERS
     double pflux;
-#endif
-#endif
+#endif /* MCTRACERS */
+#endif /* TRACERS */
     
 
 #if defined(CYLINDRICAL) && defined(FARGO)
   if (OrbitalProfile==NULL || ShearProfile==NULL)
     ath_error("[integrate_2d_vl]:  OrbitalProfile() and ShearProfile() *must* be defined.\n");
-#endif
+#endif /* CYLINDRICAL AND FARGO */
 
 /* Set etah=0 so first calls to flux functions do not use H-correction */
   etah = 0.0;
@@ -254,7 +253,7 @@ void integrate_2d_vl(DomainS *pD)
 #endif /* MHD */
 #if (NSCALARS > 0)
       for (n=0; n<NSCALARS; n++) U1d[j].s[n] = pG->U[ks][j][i].s[n];
-#endif
+#endif /* NSCALARS */
     }
 
 /*--- Step 2b ------------------------------------------------------------------
@@ -1307,6 +1306,7 @@ void integrate_2d_vl(DomainS *pD)
     /* Move tracers to new integrated position */
 //    Integrate_vf_2nd(pD);
     Integrate_vf_2nd_lower(pD);
+//    Integrate_vf_1st(pD);
     /* Move tracers to list corresponding to new position */
     vf_newijk(pD);
 #endif
@@ -1868,9 +1868,9 @@ static void ApplyCorr(GridS *pG, int i, int j,
   Real fact, qom, om_dt = Omega_0*pG->dt;
 #endif /* SHEARING_BOX */
   Real rsf=1.0,lsf=1.0;
-#ifdef MCTRACERS
-    MClistS *list;
-    double pflux;
+#ifdef MCTRACERS 
+  TracerListS *list;
+  double pflux;
 #endif /* MCTRACERS */
 
 #ifdef CYLINDRICAL

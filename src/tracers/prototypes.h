@@ -27,6 +27,7 @@ void Tracerlist_add(TracerListS *list, TracerS *tracer);
 TracerS *init_tracer();
 void tracer_list_remove(TracerListS *list, TracerS *pnode);
 void tracer_destruct(MeshS *Mesh);
+void tracer_init_threshold(GridS *pG, Real rho);
 
 /* integrate_tracers.c */
 void Tracerlist_sweep(TracerListS *list, GridS *pG);
@@ -37,11 +38,14 @@ void prob_iterate_x3(TracerListS *list, double pflux, GridS *pG);
 void ran_gen_list(GridS *pG);
 void ran_gen(GridS *pG);
 void flag_tracer_star(GridS *pG, int ic, int jc, int kc, int star_id);
+void flag_tracer_grid(GridS *pG);
+void output_tracer_star(GridS *pG, double thresh);
 
 /* vfintegrate.c */
 void vf_newijk(DomainS* pD);
 void Integrate_vf_2nd(DomainS *pD);
 void Integrate_vf_2nd_lower(DomainS *pD);
+void Integrate_vf_1st(DomainS *pD);
 void vf_newpos(GridS *pG, TracerListS *list, TracerListS *newList);
 int  interp(GridS *pG, Real weight[3][3][3], int is, int js, int ks, Real *u1, Real *u2, Real *u3);
 int  interp_prev(GridS *pG, Real weight[3][3][3], int is, int js, int ks, Real *u1, Real *u2, Real *u3);

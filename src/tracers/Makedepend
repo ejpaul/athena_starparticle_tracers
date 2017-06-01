@@ -1,40 +1,40 @@
 init_tracers.o: init_tracers.c ../copyright.h ../defs.h ../athena.h \
   ../tracers/tracers.h ../config.h ../prototypes.h \
-  ../fftsrc/prototypes.h ../gravity/prototypes.h \
+  ../fftsrc/prototypes.h ../fftsrc/fft_3d.h ../gravity/prototypes.h \
   ../integrators/prototypes.h ../microphysics/prototypes.h \
   ../particles/prototypes.h ../reconstruction/prototypes.h \
   ../rsolvers/prototypes.h ../star_particles/prototypes.h \
   ../tracers/prototypes.h ../globals.h
 integrate_tracers.o: integrate_tracers.c ../copyright.h ../defs.h \
   ../athena.h ../tracers/tracers.h ../config.h ../prototypes.h \
-  ../fftsrc/prototypes.h ../gravity/prototypes.h \
+  ../fftsrc/prototypes.h ../fftsrc/fft_3d.h ../gravity/prototypes.h \
   ../integrators/prototypes.h ../microphysics/prototypes.h \
   ../particles/prototypes.h ../reconstruction/prototypes.h \
   ../rsolvers/prototypes.h ../star_particles/prototypes.h \
   ../tracers/prototypes.h ../globals.h
 bvals_tracer.o: bvals_tracer.c ../copyright.h ../defs.h ../athena.h \
   ../tracers/tracers.h ../config.h ../prototypes.h \
-  ../fftsrc/prototypes.h ../gravity/prototypes.h \
+  ../fftsrc/prototypes.h ../fftsrc/fft_3d.h ../gravity/prototypes.h \
   ../integrators/prototypes.h ../microphysics/prototypes.h \
   ../particles/prototypes.h ../reconstruction/prototypes.h \
   ../rsolvers/prototypes.h ../star_particles/prototypes.h \
   ../tracers/prototypes.h ../globals.h
 vfintegrate.o: vfintegrate.c ../copyright.h ../defs.h ../athena.h \
   ../tracers/tracers.h ../config.h ../prototypes.h \
-  ../fftsrc/prototypes.h ../gravity/prototypes.h \
+  ../fftsrc/prototypes.h ../fftsrc/fft_3d.h ../gravity/prototypes.h \
   ../integrators/prototypes.h ../microphysics/prototypes.h \
   ../particles/prototypes.h ../reconstruction/prototypes.h \
   ../rsolvers/prototypes.h ../star_particles/prototypes.h \
   ../tracers/prototypes.h ../globals.h
 vfinterp.o: vfinterp.c ../defs.h ../athena.h ../tracers/tracers.h \
   ../copyright.h ../config.h ../prototypes.h ../fftsrc/prototypes.h \
-  ../gravity/prototypes.h ../integrators/prototypes.h \
+  ../fftsrc/fft_3d.h ../gravity/prototypes.h ../integrators/prototypes.h \
   ../microphysics/prototypes.h ../particles/prototypes.h \
   ../reconstruction/prototypes.h ../rsolvers/prototypes.h \
   ../star_particles/prototypes.h ../tracers/prototypes.h ../globals.h
 output_tracer_vtk.o: output_tracer_vtk.c ../copyright.h ../defs.h \
   ../athena.h ../tracers/tracers.h ../config.h ../prototypes.h \
-  ../fftsrc/prototypes.h ../gravity/prototypes.h \
+  ../fftsrc/prototypes.h ../fftsrc/fft_3d.h ../gravity/prototypes.h \
   ../integrators/prototypes.h ../microphysics/prototypes.h \
   ../particles/prototypes.h ../reconstruction/prototypes.h \
   ../rsolvers/prototypes.h ../star_particles/prototypes.h \

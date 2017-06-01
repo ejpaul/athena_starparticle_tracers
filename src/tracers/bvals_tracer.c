@@ -737,7 +737,6 @@ void bvals_tracer(DomainS *pD) {
         
         /* Physical boundary on left, MPI block on right */
         if (pGrid->rx3_id >= 0 && pGrid->lx3_id < 0) {
-            ath_pout(0,"In loop 3b.\n");
 
             /* Post non-blocking receives for data size from R Grids */
             err = MPI_Irecv(&(recv_buf[1]), 1, MPI_INTEGER, pGrid->rx3_id, RtoL_tag, pD->Comm_Domain, &(recv_rq[1]));
@@ -1304,10 +1303,14 @@ static void pack_ix1_tracers(GridS *pG)
                 free(tracer);
                 tracer = Next;
             }
+#ifdef DEBUG
             assert(list->count == 0);
+#endif /* DEBUG */
     }
 }
+#ifdef DEBUG
     assert(l == send_buf[0]);
+#endif /* DEBUG */
 }
 
 
@@ -1373,10 +1376,14 @@ static void pack_ox1_tracers(GridS *pG)
                 free(tracer);
                 tracer = Next;
             }
+#ifdef DEBUG
             assert(list->count == 0);
+#endif /* DEBUG */
         }
     }
+#ifdef DEBUG
     assert(l == send_buf[1]);
+#endif /* DEBUG */
 }
 
 
@@ -1577,10 +1584,14 @@ static void pack_ix3_tracers(GridS *pG)
                 if(tracer) free(tracer);
                 tracer = Next;
             }
+#ifdef DEBUG
             assert(list->count == 0);
+#endif /* DEBUG */
         }
     }
+#ifdef DEBUG
     assert(l == send_buf[0]);
+#endif /* DEBUG */
 }
 
 static void pack_ox3_tracers(GridS *pG)
@@ -1627,10 +1638,14 @@ static void pack_ox3_tracers(GridS *pG)
                 if(tracer) free(tracer);
                 tracer = Next;
             }
+#ifdef DEBUG
             assert(list->count == 0);
+#endif /* DEBUG */
         }
     }
+#ifdef DEBUG
     assert(l == send_buf[1]);
+#endif /* DEBUG */
 }
 
 static int pack_ox3_mc(GridS *pG)
@@ -1926,7 +1941,9 @@ static void unpack_ox1_mc(GridS *pG)
             for (n=1; n<=count; n++) {
                 tracer = init_tracer();
                 prop = (TracerPropS *)malloc(sizeof(TracerPropS));
+#ifdef DEBUG
                 assert(recv_buf_mc1x1 != NULL);
+#endif /* DEBUG */
                 prop->id = (double)recv_buf_mc1x1[m].id;
                 prop->d_init = (double)recv_buf_mc1x1[m].d_init;
                 prop->i_init = (int)recv_buf_mc1x1[m].i_init;

@@ -20,10 +20,10 @@
  *  (user modified via configure) */
 
 /* Version identifier when configure was last run */
-#define CONFIGURE_DATE "Sat Mar 14 17:35:37 EDT 2015"
+#define CONFIGURE_DATE "Thu Apr 30 08:39:30 EDT 2015"
 
 /* Problem generator with which Athena is compiled */
-#define A_PROBLEM "advect_2d"
+#define A_PROBLEM "blast_mc"
 
 /* HYDRO or MHD */
 #define MHD
@@ -48,7 +48,7 @@
 #define NO_MCTRACERS
 
 /* Velocity Field Tracers */
-#define VFTRACERS
+#define NO_VFTRACERS
 
 /* Self-gravity */
 #define NO_SELF_GRAVITY
@@ -66,7 +66,7 @@
 #define NO_COOLING
 
 /* resistivity, viscosity, and thermal conduction */
-#define NO_RESISTIVITY
+#define RESISTIVITY
 #define NO_VISCOSITY
 #define NO_THERMAL_CONDUCTION
 #define NO_STS
@@ -76,7 +76,7 @@
 
 /* order of spatial reconstruction: FIRST_ORDER,
  * SECOND_ORDER_CHAR, SECOND_ORDER_PRIM, THIRD_ORDER_CHAR, THIRD_ORDER_PRIM */
-#define SECOND_ORDER_PRIM
+#define THIRD_ORDER_CHAR
 
 /* flux type
  * ROE_FLUX, HLLE_FLUX, HLLC_FLUX, HLLD_FLUX, FORCE_FLUX, EXACT_FLUX,
@@ -85,13 +85,13 @@
 
 /* unsplit integrator:
  * CTU_INTEGRATOR or VL_INTEGRATOR */
-#define VL_INTEGRATOR
+#define CTU_INTEGRATOR
 
 /* Real: DOUBLE_PREC or SINGLE_PREC */
 #define DOUBLE_PREC
 
 /* debug mode: DEBUG or OPTIMIZE */
-#define DEBUG
+#define OPTIMIZE
 
 /* Write ghost cells in outputs: WRITE_GHOST_CELLS or NO_WRITE_GHOST_CELLS */
 #define NO_WRITE_GHOST_CELLS

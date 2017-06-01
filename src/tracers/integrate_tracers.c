@@ -86,10 +86,14 @@ void Tracerlist_sweep(TracerListS *list, GridS *pG)
         /* If pnode flagged, move pointers around in current list */
         next = tracer->Next;
         if (tracer->newList) {
-            //          assert(tracer->newList != list);
             //          pnode->newList->currTail = pnode;
-            tracer_list_remove(list, tracer);
-            Tracerlist_add(tracer->newList, tracer);
+            if (tracer->newList != list) {
+                tracer_list_remove(list, tracer);
+                Tracerlist_add(tracer->newList, tracer);
+            }
+            else {
+                tracer->newList = NULL;
+            }
         }
         tracer = next;
 	}
@@ -106,11 +110,14 @@ void Tracerlist_sweep_bc(TracerListS *list)
     
 	while (pnode) {
         next = pnode->Next;
+#ifdef DEBUG
         assert(pnode->newList != list);
+#endif /* DEBUG */
         /* Remove from old list */
         tracer_list_remove(list, pnode);
         /* Move to end of new list */
         Tracerlist_add(pnode->newList, pnode);
+        pnode->newList = NULL;
         /* Iterate through list */
 		pnode = next;
 	}
@@ -221,15 +228,44 @@ void prob_iterate_x3(TracerListS *list, double pflux, GridS *pG)
 /* ic, jc, kc are the indices of the new star particle */
 /*----------------------------------------------------------------------------*/
 #ifdef STAR_PARTICLE
+void flag_tracer_grid(GridS *pG)
+{
+    Real3Vect cell1;
+    Real a, b, c;
+    int ic, jc, kc;
+    StarParListS *pLstars = NULL;
+    StarParS *pStar = NULL;
+    
+    /* cell1 is a shortcut expressions as well as dimension indicator */
+    if (pG->Nx[0] > 1)  cell1.x1 = 1.0/pG->dx1;  else cell1.x1 = 0.0;
+    if (pG->Nx[1] > 1)  cell1.x2 = 1.0/pG->dx2;  else cell1.x2 = 0.0;
+    if (pG->Nx[2] > 1)  cell1.x3 = 1.0/pG->dx3;  else cell1.x3 = 0.0;
+    
+    pLstars = pG->Lstars;
+    while (pLstars) {
+        pStar = &(pLstars->starpar);
+        celli(pG, pStar->x1, cell1.x1, &ic, &a);
+        cellj(pG, pStar->x2, cell1.x2, &jc, &b);
+        cellk(pG, pStar->x3, cell1.x3, &kc, &c);
+        flag_tracer_star(pG, ic, jc, kc, pStar->id);
+        pLstars = pLstars->next;
+    }
+}
+
+
+/*----------------------------------------------------------------------------*/
+/* Mark tracers within control volume when star particle created   */
+/* ic, jc, kc are the indices of the new star particle */
+/*----------------------------------------------------------------------------*/
 void flag_tracer_star(GridS *pG, int ic, int jc, int kc, int star_id)
 {
     int i, j, k;
     TracerListS *list;
     TracerS *tracer;
     
-    for (k = kc-1; k <= kc+1; k++) {
-        for (j = jc-1; j <= jc+1; j++) {
-            for (i = ic-1; i <= ic+1; i++) {
+    for (k = kc-NSINK_STARP; k <= kc+NSINK_STARP; k++) {
+        for (j = jc-NSINK_STARP; j <= jc+NSINK_STARP; j++) {
+            for (i = ic-NSINK_STARP; i <= ic+NSINK_STARP; i++) {
                 list = &((pG->GridLists)[k][j][i]);
                 tracer = list->Head;
                 while(tracer) {
@@ -240,6 +276,90 @@ void flag_tracer_star(GridS *pG, int ic, int jc, int kc, int star_id)
         }
     }
 }
+
+/*----------------------------------------------------------------------------*/
+/* Output number of tracers in each threshold category within starpar  */
+/*----------------------------------------------------------------------------*/
+void output_tracer_star(GridS *pG, double thresh)
+{
+    TracerListS *list;
+    TracerS *tracer;
+    double thresh1 = thresh;
+    double thresh2 = thresh*10;
+    double thresh3 = thresh*10;
+    double thresh4 = thresh*100;
+    double thresh5 = thresh*100;
+    int thresh1_cnt = 0;
+    int thresh2_cnt = 0;
+    int thresh3_cnt = 0;
+    int thresh4_cnt = 0;
+    int thresh5_cnt = 0;
+    int thresh1_star = 0;
+    int thresh2_star = 0;
+    int thresh3_star = 0;
+    int thresh4_star = 0;
+    int thresh5_star = 0;
+    int is = pG->is;
+    int ie = pG->ie;
+    int js = pG->js;
+    int je = pG->je;
+    int ks = pG->ks;
+    int ke = pG->ke;
+    int i, j, k;
+    FILE *hp;
+    
+    if((hp = fopen("tracer_star.txt","a")) == NULL) {
+        ath_error("[output_tracer_star]: Unable to open dump file\n");
+        return;
+    }
+    for (k=ks; k<=ke; k++) {
+        for (j=js; j<=je; j++) {
+            for (i=is; i<=ie; i++) {
+                list = &((pG->GridLists)[k][j][i]);
+                tracer = list->Head;
+                while (tracer) {
+                    if (tracer->prop->d_init > thresh1) {
+                        thresh1_cnt++;
+                        if (tracer->prop->star_id != -1) {
+                            thresh1_star++;
+                        }
+                    }
+                    if (tracer->prop->d_init > thresh2) {
+                        thresh2_cnt++;
+                        if (tracer->prop->star_id != -1) {
+                            thresh2_star++;
+                        }
+                    }
+                    if (tracer->prop->d_init > thresh3) {
+                        thresh3_cnt++;
+                        if (tracer->prop->star_id != -1) {
+                            thresh3_star++;
+                        }
+                    }
+                    if (tracer->prop->d_init > thresh4) {
+                        thresh4_cnt++;
+                        if (tracer->prop->star_id != -1) {
+                            thresh4_star++;
+                        }
+                    }
+                    if (tracer->prop->d_init > thresh5) {
+                        thresh5_cnt++;
+                        if (tracer->prop->star_id != -1) {
+                            thresh5_star++;
+                        }
+                    }
+                    tracer = tracer->Next;
+                }
+            }
+        }
+    }
+    
+    fprintf(hp,"%lf %d %d %d %d %d %d %d %d %d %d\n",
+            pG->time, thresh1_cnt, thresh1_star, thresh2_cnt, thresh2_star,
+            thresh3_cnt, thresh3_star, thresh4_cnt, thresh4_star, thresh5_cnt, thresh5_star);
+    fclose(hp);
+}
+
 #endif /* STAR_PARTICLE */
 
 /*----------------------------------------------------------------------------*/

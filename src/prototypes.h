@@ -126,7 +126,7 @@ void fc_pos(const GridS *pG, const int i, const int j,const int k,
 #ifdef CYLINDRICAL
 Real x1vc(const GridS *pG, const int i);
 #endif
-#if defined(PARTICLES) || defined(VFTRACERS)
+#if defined(PARTICLES) || defined(VFTRACERS) || defined(MCTRACERS)
 int celli(const GridS *pG, const Real x, const Real dx1_1, int *i, Real *a);
 Real x1cc(const GridS *pG, const int i);
 int cellj(const GridS *pG, const Real y, const Real dx2_1, int *j, Real *b);

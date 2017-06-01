@@ -185,6 +185,9 @@ void integrate_3d_vl(DomainS *pD)
   for (k=ks-nghost; k<=ke+nghost; k++) {
     for (j=js-nghost; j<=je+nghost; j++) {
       for (i=is-nghost; i<=ie+nghost; i++) {
+#ifdef VFTRACERS
+        pG->U_prev[k][j][i] = pG->U[k][j][i];
+#endif /* VFTRACERS */
         Uhalf[k][j][i] = pG->U[k][j][i];
 #ifdef MHD
         B1_x1Face[k][j][i] = pG->B1i[k][j][i];
@@ -1751,7 +1754,9 @@ void integrate_3d_vl(DomainS *pD)
 #endif
 #ifdef MCTRACERS
           list = &((pG->GridLists)[k][j][i]);
-          //          assert(list->Rmass >= 0);
+#ifdef DEBUG
+          assert(list->Rmass >= 0);
+#endif /* DEBUG */
           /* If outgoing (right face) flux, MC iterate through tracers */
           if (list->Rmass > 0) {
               if (dtodx1*rsf*x1Flux[k][j][i+1].d > 0) {
@@ -1830,7 +1835,9 @@ void integrate_3d_vl(DomainS *pD)
 #endif
 #ifdef MCTRACERS
           list = &((pG->GridLists)[k][j][i]);
-          //          assert(list->Rmass >= 0);
+#ifdef DEBUG
+          assert(list->Rmass >= 0);
+#endif /* DEBUG */
           /* If outgoing (right face) flux, MC iterate through tracers */
           if (list->Rmass > 0) {
               if (dtodx2*rsf*x2Flux[k][j+1][i].d > 0) {
@@ -1875,7 +1882,9 @@ void integrate_3d_vl(DomainS *pD)
 #endif /* NSCALARS */
 #ifdef MCTRACERS
           list = &((pG->GridLists)[k][j][i]);
-          //          assert(list->Rmass >= 0);
+#ifdef DEBUG
+          assert(list->Rmass >= 0);
+#endif /* DEBUG */
           if (list->Rmass > 0) {
               /* If outgoing (right face) flux, MC iterate through tracers */
               if (dtodx3*rsf*x3Flux[k+1][j][i].d > 0) {
@@ -1946,25 +1955,28 @@ void integrate_3d_vl(DomainS *pD)
  */
     
 #ifdef VFTRACERS
-    Integrate_vf_2nd(pD);
+    Integrate_vf_2nd_lower(pD);
+//    Integrate_vf_1st(pD);
+    /* Move tracers to list corresponding to new position */
+    vf_newijk(pD);
 #endif /* VFTRACERS */
     
 #if defined(MCTRACERS) || defined(VFTRACERS)
-    for (k=ks; k<=ke; k++) {
-        for (j=js; j<=je; j++) {
-            for (i=is; i<=ie; i++) {
+    for (k=ks-1; k<=ke+1; k++) {
+        for (j=js-1; j<=je+1; j++) {
+            for (i=is-1; i<=ie+1; i++) {
                 /* sweep through list to move tracers marked */
                 list = &((pG->GridLists)[k][j][i]);
                 Tracerlist_sweep(list, pG);
-#endif /* TRACERS */
                 /* Change reduced mass */
 #ifdef MCTRACERS
                 list->Rmass = (pG->U[k][j][i].d);
-#endif
-
+#endif /* MCTRACERS */
             }
         }
     }
+#endif /* TRACERS */
+
 #ifdef MCTRACERS
     if (par_exist("problem","inflow_xl")) {
         for (k=ks; k<=ke; k++) {
@@ -2889,7 +2901,7 @@ static void ApplyCorr(GridS *pG, int i, int j, int k,
 #endif /* SHEARING_BOX */
   Real lsf=1.0,rsf=1.0;
 #if defined(MCTRACERS) || defined(VFTRACERS)
-    MClistS *list;
+    TracerListS *list;
 #endif /* TRACERS */
 #ifdef MCTRACERS
     double pflux;
@@ -2914,7 +2926,9 @@ static void ApplyCorr(GridS *pG, int i, int j, int k,
     
 #ifdef MCTRACERS
     list = &((pG->GridLists)[k][j][i]);
+#ifdef DEBUG
     assert(list->Rmass >= 0);
+#endif /* DEBUG */
     /* If outgoing (right face) flux, MC iterate through tracers */
     if (list->Rmass > 0) {
         if (dtodx1*rsf*rx1*x1FD_ip1.d < 0) {
@@ -2949,7 +2963,9 @@ static void ApplyCorr(GridS *pG, int i, int j, int k,
     
 #ifdef MCTRACERS
     list = &((pG->GridLists)[k][j][i]);
+#ifdef DEBUG
     assert(list->Rmass >= 0);
+#endif /* DEBUG */
     /* If outgoing (right face) flux, MC iterate through tracers */
     if (list->Rmass > 0) {
         if (dtodx2*rx2*x2FD_jp1.d < 0) {
@@ -2984,7 +3000,9 @@ static void ApplyCorr(GridS *pG, int i, int j, int k,
     
 #ifdef MCTRACERS
     list = &((pG->GridLists)[k][j][i]);
+#ifdef DEBUG
     assert(list->Rmass >= 0);
+#endif /* DEBUG */
     /* If outgoing (right face) flux, MC iterate through tracers */
     if (list->Rmass > 0) {
         if (dtodx3*rx3*x3FD_kp1.d < 0) {

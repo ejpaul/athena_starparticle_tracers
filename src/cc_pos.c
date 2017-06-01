@@ -77,7 +77,7 @@ Real x1vc(const GridS* pG, const int i)
 }
 #endif
 
-#if defined(PARTICLES) || defined(VFTRACERS)
+#if defined(PARTICLES) || defined(VFTRACERS) || defined(MCTRACERS)
 /*============================================================================
 cell-location functions 
 ============================================================================*/

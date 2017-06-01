@@ -1,46 +1,35 @@
 #include "copyright.h"
-/*============================================================================*/
-/*! \file ath_files.c
- *  \brief Function for creating descriptive output filenames.
+/*==============================================================================
+ * FILE: ath_files.c
  *
  * PURPOSE: Function for creating descriptive output filenames with form:
- *  -     [path]<basename>[-lev#][-dom#][.idump][.id].<ext>
- *
- *   where 
- *     -   path     = optional path
- *     -   basename = basename of file (usually problem name, e.g. "Sod")
- *     -   lev#     = level number of dump, only included when level > 0
- *     -   dom#     = domain number of dump, only included when domain != 0
- *     -   dlen     = number of digits to use for numeric extension (1..10)
- *     -   idump    = optional dump number (0,1,2,.....)
+ *        [path]<basename>[-lev#][-dom#][.idump][.id].<ext>
+ *   where path     = optional path
+ *         basename = basename of file (usually problem name, e.g. "Sod")
+ *         lev#     = level number of dump, only included when level > 0
+ *         dom#     = domain number of dump, only included when domain != 0
+ *         dlen     = number of digits to use for numeric extension (1..10)
+ *         idump    = optional dump number (0,1,2,.....)
  *                    if(dlen > 0 and idump >= 0) we use the dump number
  *                    <idump> uses C-format descriptor "%0<dlen>d"
- *     -   id       = optional additional identifier set in <input> block
- *     -   ext      = file extension, e.g. ".tab", ".bin", ".dx", ".vtk"
+ *         id       = optional additional identifier set in <input> block
+ *         ext      = file extension, e.g. ".tab", ".bin", ".dx", ".vtk"
  *
  * CONTAINS PUBLIC FUNCTIONS: 
- *   ath_fname()							      */
-/*============================================================================*/
+ *   ath_fname()
+ *============================================================================*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "prototypes.h"
 
 /*----------------------------------------------------------------------------*/
-/*! \fn char *ath_fname(const char *path, const char *basename,
- *                      const char *levstr, const char *domstr, 
- *                      const int dlen, const int idump,
- *                      const char *id, const char *ext)
- *  \brief Creates descriptive output filenames.
- *
- *   Creates filenames with form 
- *    - [path]<basename>[-lev#][-dom#][.idump][.id].<ext>
- *
+/* ath_fname: creates filename with form 
+// *   [path]<basename>[-lev#][-dom#][.idump][.id].<ext>
+ *   [path]<basename>[-lev#][-dom#][.id][.idump].<ext>
  *   Used by most of the dump_*() and output_*() functions.
- *
- * This function malloc's the memory needed for the name.  The calling function
- * must free this memory once it is no longer needed.
  */
+
 char *ath_fname(const char *path, const char *basename,
                 const char *levstr, const char *domstr,
                 const int dlen, const int idump,
@@ -112,8 +101,10 @@ char *ath_fname(const char *path, const char *basename,
 /* id not NULL */
   if(id){
     if(dlen > 0 && idump >= 0){
-      sprintf(fmt,".%%0%dd.%%s.%%s",dlen);
-      sprintf(cp,fmt,idump,id,ext);
+//      sprintf(fmt,".%%0%dd.%%s.%%s",dlen);
+//      sprintf(cp,fmt,idump,id,ext);
+      sprintf(fmt,".%%s.%%0%dd.%%s",dlen);
+      sprintf(cp,fmt,id,idump,ext);
     }
     else sprintf(cp,".%s.%s",id,ext);
   }

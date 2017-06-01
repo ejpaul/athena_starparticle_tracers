@@ -33,6 +33,10 @@
 static Real rho_small;
 void derivs(Real x, Real y[], Real dy[]);
 
+#if defined(VFTRACERS) || defined(MCTRACERS)
+static Real thresh = 0.01;
+#endif
+
 /* ========================================================================== */
 /*
  *  Function problem
@@ -129,12 +133,14 @@ void problem(DomainS *pD)
         if (r <= r_out) {
           ii = MIN((int)rint(r/dr),NSOLN-1);
           pG->U[k][j][i].d = rho_soln[ii];
+           // pG->U[k][j][i].M1 = 2*rho_soln[ii];
+            // Only initialize tracers in overdense region
           list = &((pG->GridLists)[k][j][i]);
           init_tracer_list(pG, list, rho*rho_soln[ii]);
         }
         else {
           pG->U[k][j][i].d = rho_small;
-          
+          // pG->U[k][j][i].M1 = 2*rho_small;
         }
       }
     }
@@ -201,12 +207,92 @@ void Userwork_in_loop(MeshS *pM)
     }
   }
     
+#if defined(MCTRACERS) || defined(VFTRACERS)
+    flag_tracer_grid(pG);
+    output_tracer_star(pG, thresh);
+#endif /* TRACERS */
+    
 #endif /* STAR_PARTICLE */
   
   return;
 }
 
 /* ========================================================================== */
+
+#if defined(MCTRACERS) || defined(VFTRACERS)
+static Real thresh_1(const GridS *pG, const int i, const int j, const int k)
+{
+    int count = 0;
+    double thresh1 = thresh;
+    TracerListS *list= &(pG->GridLists)[k][j][i];
+    TracerS *tracer = list->Head;
+    while(tracer) {
+        if (tracer->prop->d_init > thresh1) count++;
+        tracer = tracer->Next;
+    }
+    return count;
+}
+#endif /* TRACERS */
+
+#if defined(MCTRACERS) || defined(VFTRACERS)
+static Real thresh_2(const GridS *pG, const int i, const int j, const int k)
+{
+    int count = 0;
+    double thresh2 = thresh*10;
+    TracerListS *list= &(pG->GridLists)[k][j][i];
+    TracerS *tracer = list->Head;
+    while(tracer) {
+        if (tracer->prop->d_init > thresh2) count++;
+        tracer = tracer->Next;
+    }
+    return count;
+}
+#endif /* TRACERS */
+
+#if defined(MCTRACERS) || defined(VFTRACERS)
+static Real thresh_3(const GridS *pG, const int i, const int j, const int k)
+{
+    int count = 0;
+    double thresh3 = thresh*50;
+    TracerListS *list= &(pG->GridLists)[k][j][i];
+    TracerS *tracer = list->Head;
+    while(tracer) {
+        if (tracer->prop->d_init > thresh3) count++;
+        tracer = tracer->Next;
+    }
+    return count;
+}
+#endif /* TRACERS */
+
+#if defined(MCTRACERS) || defined(VFTRACERS)
+static Real thresh_4(const GridS *pG, const int i, const int j, const int k)
+{
+    int count = 0;
+    double thresh4 = thresh*100;
+    TracerListS *list= &(pG->GridLists)[k][j][i];
+    TracerS *tracer = list->Head;
+    while(tracer) {
+        if (tracer->prop->d_init > thresh4) count++;
+        tracer = tracer->Next;
+    }
+    return count;
+}
+#endif /* TRACERS */
+
+#if defined(MCTRACERS) || defined(VFTRACERS)
+static Real thresh_5(const GridS *pG, const int i, const int j, const int k)
+{
+    int count = 0;
+    double thresh5 = thresh*1000;
+    TracerListS *list= &(pG->GridLists)[k][j][i];
+    TracerS *tracer = list->Head;
+    while(tracer) {
+        if (tracer->prop->d_init > thresh5) count++;
+        tracer = tracer->Next;
+    }
+    return count;
+}
+#endif /* TRACERS */
 
 #if defined(MCTRACERS) || defined(VFTRACERS)
 static Real d_init(const GridS *pG, const int i, const int j, const int k)
@@ -255,6 +341,11 @@ ConsFun_t get_usr_expr(const char *expr)
   if(strcmp(expr, "num_density")==0) return num_density;
   if(strcmp(expr, "d_init")==0) return d_init;
   if(strcmp(expr, "ratio_map")==0) return d_init;
+    if(strcmp(expr, "thresh_1")==0) return thresh_1;
+    if(strcmp(expr, "thresh_2")==0) return thresh_2;
+    if(strcmp(expr, "thresh_3")==0) return thresh_3;
+    if(strcmp(expr, "thresh_4")==0) return thresh_4;
+    if(strcmp(expr, "thresh_5")==0) return thresh_5;
 #endif /* TRACERS */
   return NULL;
 }

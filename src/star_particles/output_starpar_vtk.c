@@ -90,7 +90,19 @@ void output_starpar_vtk(MeshS *pM, OutputS *pOut)
     /*  4. Dataset structure (star particle positions) */
     fprintf(pfile,"DATASET UNSTRUCTURED_GRID\n");
 
-    fprintf(pfile,"NSTARS %d \n", nstars);
+    fprintf(pfile,"POINTS %d float \n", nstars);
+      pGstars = pGrid->Gstars;
+      i = 0;
+      while (pGstars) {
+          pStar = &(pGstars->starpar);
+          data[3*i  ] = (float)pStar->x1;
+          data[3*i+1] = (float)pStar->x2;
+          data[3*i+2] = (float)pStar->x3;
+          i++;
+          pGstars = pGstars->next;
+      }
+      if (!big_end) ath_bswap(data,sizeof(float),3*nstars);
+      if (nstars) fwrite(data,sizeof(float),3*nstars,pfile);
     
     /* Treat all star particles as VTK_VERTEX (type=1) data structures.
      * There is 1 "cell" of type 1 containing each vertex, and it
@@ -156,22 +168,6 @@ void output_starpar_vtk(MeshS *pM, OutputS *pOut)
     }
     if (!big_end) ath_bswap(data,sizeof(float),nstars);
     if (nstars) fwrite(data,sizeof(float),nstars,pfile);
-    fprintf(pfile,"\n");
-
-     /* Write star particle positions */
-    fprintf(pfile,"VECTORS star_particle_position float\n");
-    pGstars = pGrid->Gstars;
-    i = 0;
-    while (pGstars) {
-      pStar = &(pGstars->starpar);
-      data[3*i  ] = (float)pStar->x1;
-      data[3*i+1] = (float)pStar->x2;
-      data[3*i+2] = (float)pStar->x3;
-      i++;
-      pGstars = pGstars->next;
-    }
-    if (!big_end) ath_bswap(data,sizeof(float),3*nstars);
-    if (nstars) fwrite(data,sizeof(float),3*nstars,pfile);
     fprintf(pfile,"\n");
     
     /* Write star particle velocities */

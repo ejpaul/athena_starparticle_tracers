@@ -50,11 +50,6 @@ static Real usr_Sigma3(const GridS *pG,const int i,const int j,const int k);
 static Real dEk(const GridS *pG, const int i, const int j, const int k);
 static Real num_density(const GridS *pG, const int i, const int j, const int k);
 static Real d_init(const GridS *pG, const int i, const int j, const int k);
-static Real thresh_1(const GridS *pG, const int i, const int j, const int k);
-static Real thresh_2(const GridS *pG, const int i, const int j, const int k);
-static Real thresh_3(const GridS *pG, const int i, const int j, const int k);
-static Real thresh_4(const GridS *pG, const int i, const int j, const int k);
-static Real thresh_5(const GridS *pG, const int i, const int j, const int k);
 
 /* Uncomment the following define to drive the flow in an impulsive manner
  as was done originally.  Restarts for this mode not yet implemented! */
@@ -98,14 +93,8 @@ static Real x1min,x1max,x2min,x2max,x3min,x3max;
 static Real dx,dV;
 
 #if defined(MCTRACERS) || defined(VFTRACERS)
-/* Boolean- have tracers been deposited ? */
-static int tracer_deposit = 0;
-/* Time to deposit tracers */
-static Real t_dep;
 /* Mach number */
 static Real mach;
-/* Threshold density */
-static Real thresh;
 #endif
 
 /* Seed for random number generator */
@@ -167,6 +156,10 @@ void problem(DomainS *pD)
                 pG->U[k][j][i].d = rho;            }
         }
     }
+    
+#if defined(MCTRACERS) || defined(VFTRACERS)
+    tracer_init_unif(pG);
+#endif /* TRACERS */
     
     /* Set the initial perturbations.  Note that we're putting in too much
      * energy this time.  This is okay since we're only interested in the
@@ -250,11 +243,6 @@ ConsFun_t get_usr_expr(const char *expr)
 #if defined(MCTRACERS) || defined(VFTRACERS)
     if(strcmp(expr, "num_density")==0) return num_density;
     if(strcmp(expr, "d_init")==0) return d_init;
-    if(strcmp(expr, "thresh_1")==0) return thresh_1;
-    if(strcmp(expr, "thresh_2")==0) return thresh_2;
-    if(strcmp(expr, "thresh_3")==0) return thresh_3;
-    if(strcmp(expr, "thresh_4")==0) return thresh_4;
-    if(strcmp(expr, "thresh_5")==0) return thresh_5;
 #endif /* TRACERS */
     return NULL;
 }
@@ -344,32 +332,6 @@ void Userwork_in_loop(MeshS *pM)
     }
     
 #endif /* STAR_PARTICLE */
-    
-#if defined(MCTRACERS) || defined(VFTRACERS)
-    for (nl=0; nl<pM->NLevels; nl++) {
-        for (nd=0; nd<pM->DomainsPerLevel[nl]; nd++) {
-            if (pM->Domain[nl][nd].Grid != NULL) {
-                pD = &(pM->Domain[nl][nd]);
-                pG = pD->Grid;
-                
-                /* Check if past t_dep */
-                /* Deposit Tracers */
-                newtime = pG->time + pG->dt;
-                if (newtime >= t_dep) {
-                    if (tracer_deposit == 0) {
-                        tracer_init_threshold(pG, thresh);
-                        tracer_deposit = 1;
-                    }
-#ifdef STAR_PARTICLE
-                    flag_tracer_grid(pG);
-                    output_tracer_star(pG, thresh);
-#endif /* STAR_PARTICLE */
-                }
-                
-            }
-        }
-    }
-#endif /* TRACERS */
     
     if (isnan(pG->dt)) ath_error("[turb_tracer]:  Time step is NaN!");
     
@@ -713,156 +675,6 @@ static Real hst_Efree_out(const GridS *pG,const int i,const int j,const int k)
 static Real num_density(const GridS *pG, const int i, const int j, const int k)
 {
     Real count = (Real) (pG->GridLists)[k][j][i].count;
-    return count;
-}
-#endif /* TRACERS */
-
-#if defined(MCTRACERS) || defined(VFTRACERS)
-static Real thresh_1_t1(const GridS *pG, const int i, const int j, const int k)
-{
-    int count = 0;
-    double thresh1 = thresh;
-    TracerListS *list= &(pG->GridLists)[k][j][i];
-    TracerS *tracer = list->Head;
-    while(tracer) {
-        if (tracer->prop->d_init > thresh1) count++;
-        tracer = tracer->Next;
-    }
-    return count;
-}
-#endif /* TRACERS */
-
-#if defined(MCTRACERS) || defined(VFTRACERS)
-static Real thresh_2_t1(const GridS *pG, const int i, const int j, const int k)
-{
-    int count = 0;
-    double thresh2 = thresh*10;
-    TracerListS *list= &(pG->GridLists)[k][j][i];
-    TracerS *tracer = list->Head;
-    while(tracer) {
-        if (tracer->prop->d_init > thresh2) count++;
-        tracer = tracer->Next;
-    }
-    return count;
-}
-#endif /* TRACERS */
-
-#if defined(MCTRACERS) || defined(VFTRACERS)
-static Real thresh_3_t1(const GridS *pG, const int i, const int j, const int k)
-{
-    int count = 0;
-    double thresh3 = thresh*50;
-    TracerListS *list= &(pG->GridLists)[k][j][i];
-    TracerS *tracer = list->Head;
-    while(tracer) {
-        if (tracer->prop->d_init > thresh3) count++;
-        tracer = tracer->Next;
-    }
-    return count;
-}
-#endif /* TRACERS */
-
-#if defined(MCTRACERS) || defined(VFTRACERS)
-static Real thresh_4_t1(const GridS *pG, const int i, const int j, const int k)
-{
-    int count = 0;
-    double thresh4 = thresh*100;
-    TracerListS *list= &(pG->GridLists)[k][j][i];
-    TracerS *tracer = list->Head;
-    while(tracer) {
-        if (tracer->prop->d_init > thresh4) count++;
-        tracer = tracer->Next;
-    }
-    return count;
-}
-#endif /* TRACERS */
-
-#if defined(MCTRACERS) || defined(VFTRACERS)
-static Real thresh_5_t1(const GridS *pG, const int i, const int j, const int k)
-{
-    int count = 0;
-    double thresh5 = thresh*1000;
-    TracerListS *list= &(pG->GridLists)[k][j][i];
-    TracerS *tracer = list->Head;
-    while(tracer) {
-        if (tracer->prop->d_init > thresh5) count++;
-        tracer = tracer->Next;
-    }
-    return count;
-}
-#endif /* TRACERS */
-
-#if defined(MCTRACERS) || defined(VFTRACERS)
-static Real thresh_1_t2(const GridS *pG, const int i, const int j, const int k)
-{
-    int count = 0;
-    double thresh1 = thresh;
-    TracerListS *list= &(pG->GridLists)[k][j][i];
-    TracerS *tracer = list->Head;
-    while(tracer) {
-        if (tracer->prop->d_init > thresh1) count++;
-        tracer = tracer->Next;
-    }
-    return count;
-}
-#endif /* TRACERS */
-
-#if defined(MCTRACERS) || defined(VFTRACERS)
-static Real thresh_2_t2(const GridS *pG, const int i, const int j, const int k)
-{
-    int count = 0;
-    double thresh2 = thresh*10;
-    TracerListS *list= &(pG->GridLists)[k][j][i];
-    TracerS *tracer = list->Head;
-    while(tracer) {
-        if (tracer->prop->d_init > thresh2) count++;
-        tracer = tracer->Next;
-    }
-    return count;
-}
-#endif /* TRACERS */
-
-#if defined(MCTRACERS) || defined(VFTRACERS)
-static Real thresh_3_t2(const GridS *pG, const int i, const int j, const int k)
-{
-    int count = 0;
-    double thresh3 = thresh*50;
-    TracerListS *list= &(pG->GridLists)[k][j][i];
-    TracerS *tracer = list->Head;
-    while(tracer) {
-        if (tracer->prop->d_init > thresh3) count++;
-        tracer = tracer->Next;
-    }
-    return count;
-}
-#endif /* TRACERS */
-
-#if defined(MCTRACERS) || defined(VFTRACERS)
-static Real thresh_4_t2(const GridS *pG, const int i, const int j, const int k)
-{
-    int count = 0;
-    double thresh4 = thresh*100;
-    TracerListS *list= &(pG->GridLists)[k][j][i];
-    TracerS *tracer = list->Head;
-    while(tracer) {
-        if (tracer->prop->d_init > thresh4) count++;
-        tracer = tracer->Next;
-    }
-    return count;
-}
-#endif /* TRACERS */
-
-#if defined(MCTRACERS) || defined(VFTRACERS)
-static Real thresh_5_t2(const GridS *pG, const int i, const int j, const int k)
-{
-    int count = 0;
-    double thresh5 = thresh*1000;
-    TracerListS *list= &(pG->GridLists)[k][j][i];
-    TracerS *tracer = list->Head;
-    while(tracer) {
-        if (tracer->prop->d_init > thresh5) count++;
-        tracer = tracer->Next;
-    }
     return count;
 }
 #endif /* TRACERS */
@@ -1245,9 +1057,6 @@ static void initialize(DomainS *pD)
     rho_small   = par_getd("problem", "rho_small");
     rho         = par_getd("problem", "rho");
     rcloud      = par_getd("problem", "rcloud");
-#if defined(MCTRACERS) || defined(VFTRACERS )
-    t_dep       = par_getd("problem", "t_dep");
-#endif /* TRACERS */
     
     /* Initialize units
      *
@@ -1368,8 +1177,6 @@ static void initialize(DomainS *pD)
 #if defined(MCTRACERS) || defined(VFTRACERS)
     mach = v_turb/Iso_csound;
     ath_pout(0,"Mach number = %e\n",mach);
-    thresh = mach*mach*rho*0.01;
-    ath_pout(0,"Threshold density = %e\n", thresh);
 #endif
     
     /* parameters for spectrum */

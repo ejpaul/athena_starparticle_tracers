@@ -2,9 +2,6 @@
 problem = Simple test of gravitational collapse, star particle creation, radiative feedback (RADIATION & STAR_PARTICLE)
 author  = A. Skinner
 journal = unpublished
-config  =
-# withtracers --with-order=2p --with-integrator=vl --with-flux=roe --with-gas=hydro --enable-mctracers --with-problem=turb_tracer --enable-starparticle --enable-mpi
-# --with-eos=isothermal  --with-gravity=fft_obc   --enable-fofc --enable-h-correction --enable-fft
 
 <log>
 file_open       = 0                 # write to .out file?  otherwise, writes to stdout
@@ -12,33 +9,99 @@ out_level       = 1                 # sets output level (default=0)
 
 <job>
 problem_id      = turb_tracer       # problem ID: basename of output filenames
-maxout          = 4                 # Output blocks number from 1 -> maxout
+maxout          = 15                 # Output blocks number from 1 -> maxout
 num_domains     = 1                 # number of Domains in Mesh
 
 <output1>
 out_fmt         = vtk               # VTK data dump
-dt              = 0.01              # time increment between outputs
+out             = d
+dt              = 0.1              # time increment between outputs
 
 <output2>
 out_fmt         = vtk
 out             = d
-id              = d1
-x1              = 0.0
-dt              = 0.01
+id              = d_proj
+x1              = :
+dt              = 0.1
 
-<output3>
+<output5>
 out_fmt         = vtk
-dt              = 0.01
+dt              = 0.1
 usr_expr_flag   = 1
-out             = MC_num
-id              = MC_num
+out             = thresh_1
+id              = thresh_1
 
-<output4>
-out_fmt         = vtk
-dt              = 0.01
+<output6>
+out_fmt          = vtk
+dt              = 0.1
 usr_expr_flag   = 1
-out             = d_init
-id              = d_init
+x1              = :
+out             = thresh_1
+id              = thresh_1_proj
+
+<output7>
+out_fmt         = vtk
+dt              = 0.1
+usr_expr_flag   = 1
+out             = thresh_2
+id              = thresh_2
+
+<output8>
+out_fmt         = vtk
+dt              = 0.1
+x1              = :
+usr_expr_flag   = 1
+out             = thresh_2
+id              = thresh_2_proj
+
+<output9>
+out_fmt         = vtk
+dt              = 0.1
+usr_expr_flag   = 1
+out             = thresh_3
+id              = thresh_3
+
+<output10>
+out_fmt         = vtk
+dt              = 0.1
+usr_expr_flag   = 1
+x1              = :
+out             = thresh_3
+id              = thresh_3_proj
+
+<output11>
+out_fmt         = vtk
+dt              = 0.1
+usr_expr_flag   = 1
+out             = thresh_4
+id              = thresh_4
+
+<output12>
+out_fmt         = vtk
+dt              = 0.1
+usr_expr_flag   = 1
+x1              = :
+out             = thresh_4
+id              = thresh_4_proj
+
+<output13>
+out_fmt         = vtk
+dt              = 0.1
+usr_expr_flag   = 1
+out             = thresh_5
+id              = thresh_5
+
+<output14>
+out_fmt         = vtk
+dt              = 0.1
+usr_expr_flag   = 1
+x1              = :
+out             = thresh_5
+id              = thresh_5_proj
+
+<output15>
+out_fmt = starpar_vtk      # vtk data dump
+dt      = 0.1
 
 <time>
 cour_no         = 0.4               # CF Number
@@ -70,6 +133,8 @@ NGrid_x2        = 1
 NGrid_x3        = 1
 
 <problem>
+N_proportional   = 10                # proportionality of tracer to fluid density
+d_prop           = 10                # Density threshold for tracer deposit (rho*d_prop)
 gamma            = 1.66666666666667  # gamma = C_p/C_v
 rho_small        = 0.01              # background density floor
 rho              = 100               # cm^-3 (helium number density)
@@ -80,8 +145,6 @@ alpha_vir        = 4.0               # scale dv such that Ekin = 0.5*alpha_vir*E
 beta             = 0.02              # isothermal pressure/magnetic pressure (MHD only)
 rho_crit         = 10000.0           # critical density for star particle creation
 t_dep            = 7.5               # time to deposit mc_tracers
-d_prop           = 10
-
 expo             = 3.0               # exponent of power-law spectrum (ispect=1)
 klow             = 2.0               # multiple of 2*pi/L for cut-off at low  wavenumbers
 khigh            = 64.0              # multiple of 2*pi/L for cut-off at high wavenumbers

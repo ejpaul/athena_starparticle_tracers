@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include "../defs.h"
 #include "../athena.h"
 #include "../globals.h"

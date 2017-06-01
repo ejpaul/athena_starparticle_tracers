@@ -117,9 +117,6 @@ void create_starparticles(DomainS *pD)
                   }
                   if (new_star_particle_flag)
                     push_to_local_list(pG,i,j,k,starpar_id);
-#if defined(MCTRACERS) || defined(VFTRACERS)
-                    flag_tracer_star(pG, i, j, k, starpar_id);
-#endif /* TRACERS */
                 }
 #ifdef STRICT_STARPARTICLE_CREATION
 #ifdef SELF_GRAVITY
@@ -414,6 +411,10 @@ void push_to_local_list(GridS *pG, int ip, int jp, int kp, int starpar_id)
         M1t += pG->U[k][j][i].M1;
         M2t += pG->U[k][j][i].M2;
         M3t += pG->U[k][j][i].M3;
+
+#if defined(MCTRACERS) || defined(VFTRACERS)
+       flag_tracer_star(pG, ip, jp, kp, starpar_id);
+#endif /* TRACERS */
 
 #ifdef OVERLAP
 /* exclude overlapped control volume with existing star particles */
