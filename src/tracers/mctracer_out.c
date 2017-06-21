@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*  \brief Function to write dumps of mc tracer "history" in a
 /*  formatted table. */
-
+/*  This functio is currently not being called and probably has not been tested */ 
 void mctracer_out(MeshS *pM, OutputS *pOut)
 {
     GridS *pG;
