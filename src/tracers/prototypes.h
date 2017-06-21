@@ -35,8 +35,6 @@ void Tracerlist_sweep_bc(TracerListS *list);
 void prob_iterate_x1(TracerListS *list, double pflux, GridS *pG);
 void prob_iterate_x2(TracerListS *list, double pflux, GridS *pG);
 void prob_iterate_x3(TracerListS *list, double pflux, GridS *pG);
-void ran_gen_list(GridS *pG);
-void ran_gen(GridS *pG);
 void flag_tracer_star(GridS *pG, int ic, int jc, int kc, int star_id);
 void flag_tracer_grid(GridS *pG);
 void output_tracer_star(GridS *pG, double thresh);

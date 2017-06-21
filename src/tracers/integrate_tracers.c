@@ -33,45 +33,9 @@ static gsl_rng *rng;
 /* ========================================================================== */
 
 /*----------------------------------------------------------------------------*/
-/* Fill pG->random with ran2() generated doubles                              */
-/*----------------------------------------------------------------------------*/
-void ran_gen(GridS *pG) {
-
-    long s = time(NULL);
-    int pid = myID_Comm_world;
-    
-    seed = abs(((s*181)*((pid-83)*359))%104729);
-    rng = gsl_rng_alloc(gsl_rng_mt19937);
-    gsl_rng_set(rng, seed);
-    
-//    n1z = pG->Nx[0] + 2*nghost;
-//    n2z = pG->Nx[1] + 2*nghost;
-//    ran2(&seed);
-//    pG->rand_list = (double **)calloc_2d_array(n1z, n2z, sizeof(double));
-    
-    return;
-}
-
-/*----------------------------------------------------------------------------*/
-/* Fill pG->random with ran2() generated doubles                              */
-/*----------------------------------------------------------------------------*/
-void ran_gen_list(GridS *pG) {
-    
-//    seed = 0;
-//    rng = gsl_rng_alloc(gsl_rng_mt19937);
-//    gsl_rng_set(rng, seed);
-//    
-//    for (j = pG->js-nghost; j<=pG->je+nghost; j++) {
-//        for (i = pG->is-nghost; i<=pG->ie+nghost; i++) {
-//            pG->rand_list[i][j] = gsl_rng_uniform(rng);
-//        }
-//    }
-    
-    return;
-}
-
-/*----------------------------------------------------------------------------*/
 /* Sweeps through list and moves nodes flagged for removal                    */
+/* newList is a pointer to a list to be moved to. If newList is null, tracer  */
+/* is not flagged for removal.                                                */
 /*----------------------------------------------------------------------------*/
 void Tracerlist_sweep(TracerListS *list, GridS *pG)
 {
@@ -79,14 +43,8 @@ void Tracerlist_sweep(TracerListS *list, GridS *pG)
     TracerS *next;
     
 	while (tracer) {
-        /* If have reached nodes added during current cycle, return */
-        //        if (list->currTail) {
-        //            if (pnode == list->currTail) return;
-        //        }
-        /* If pnode flagged, move pointers around in current list */
         next = tracer->Next;
         if (tracer->newList) {
-            //          pnode->newList->currTail = pnode;
             if (tracer->newList != list) {
                 tracer_list_remove(list, tracer);
                 Tracerlist_add(tracer->newList, tracer);
@@ -101,24 +59,26 @@ void Tracerlist_sweep(TracerListS *list, GridS *pG)
 }
 
 /*----------------------------------------------------------------------------*/
-/* Sweeps through list and moves nodes flagged for removal at boundary        */
+/* Sweeps through list and moves nodes flagged for removal at boundary.       */
+/* Performs same function as Tracerlist_sweep, but all tracers in ghost zone  */
+/* are flagged for removal.
 /*----------------------------------------------------------------------------*/
 void Tracerlist_sweep_bc(TracerListS *list)
 {
 	TracerS *pnode = list->Head;
-    TracerS *next;
+  TracerS *next;
     
 	while (pnode) {
-        next = pnode->Next;
+    next = pnode->Next;
 #ifdef DEBUG
-        assert(pnode->newList != list);
+    assert(pnode->newList != list);
 #endif /* DEBUG */
-        /* Remove from old list */
-        tracer_list_remove(list, pnode);
-        /* Move to end of new list */
-        Tracerlist_add(pnode->newList, pnode);
-        pnode->newList = NULL;
-        /* Iterate through list */
+    /* Remove from old list */
+    tracer_list_remove(list, pnode);
+    /* Move to end of new list */
+    Tracerlist_add(pnode->newList, pnode);
+    pnode->newList = NULL;
+    /* Iterate through list */
 		pnode = next;
 	}
     
@@ -173,9 +133,6 @@ void prob_iterate_x2(TracerListS *list, double pflux, GridS *pG)
         /* If pnode has not been flagged earlier in current loop */
         if (pnode->newList == NULL) {
             rand = gsl_rng_uniform(rng);
-//            rand = rand_list[curr_index];
-//            curr_index++;
-//            if (curr_index == rand_len) ran_gen_list(pG);
             if (pflux > 0) {
                 if (rand <= pflux) {
                     pnode->newList = &((pG->GridLists)[k][j+1][i]);
@@ -363,7 +320,8 @@ void output_tracer_star(GridS *pG, double thresh)
 #endif /* STAR_PARTICLE */
 
 /*----------------------------------------------------------------------------*/
-/* Implement top hat algorithm */
+/* Implement top hat algorithm. The count attribute of the tracer list is     */
+/* smoothed with a radius of rfilter.                                         */
 /*----------------------------------------------------------------------------*/
 #ifdef TOPHAT
 void mc_tophat(GridS *pG)

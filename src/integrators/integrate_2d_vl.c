@@ -1149,7 +1149,6 @@ void integrate_2d_vl(DomainS *pD)
 #endif
 #ifdef MCTRACERS
         list = &((pG->GridLists)[ks][j][i]);
-        ran_gen_list(pG);
         
         if (list->Rmass > 0) {
             /* If outgoing (right face) flux, MC iterate through tracers */
@@ -1886,7 +1885,6 @@ static void ApplyCorr(GridS *pG, int i, int j,
     
 #ifdef MCTRACERS
     list = &((pG->GridLists)[ks][j][i]);
-    ran_gen_list(pG);
     
     if (list->Rmass > 0) {
         /* If outgoing (right face) flux, MC iterate through tracers */

@@ -404,9 +404,10 @@ typedef struct Grid_s{
 #ifdef TOPHAT
     TracertophatS ***TopHatGrid;
 #endif
-#ifdef MCTRACERS
+// rand_list array is no longer necessary
+/* #ifdef MCTRACERS
     double **rand_list;         /* randomly generated array */
-#endif /* MCTRACRS */
+/* #endif /* MCTRACRS */
 #ifdef VFTRACERS
     ConsS ***U_prev;
 #endif /* VFTRACERS */

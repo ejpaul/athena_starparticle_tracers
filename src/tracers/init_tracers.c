@@ -98,9 +98,10 @@ void init_tracer_grid(MeshS *pM)
     pG->TopHatGrid = (TracertophatS***)calloc_3d_array(n3z, n2z, n1z, sizeof(TracertophatS));
     if (pG->TopHatGrid == NULL) goto on_error;
 #endif /* TOPHAT */
-    
+  
+    // Random number grid no longer necessary
     /* Initialize PRNG */
-    ran_gen(pG);
+    // ran_gen(pG);
     
     /* Loop over grid, initialize TracerlistS */
     for (k=kl; k<=kr; k++) {
